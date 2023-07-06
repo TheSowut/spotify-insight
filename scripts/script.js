@@ -44,6 +44,7 @@ var isFetching = false;
 var accessToken = '';
 var data = [];
 var limitReached = false;
+var trackPosition = 0;
 // Functions
 var fetchData = function () { return __awaiter(_this, void 0, void 0, function () {
     var h1, response, count, res, _i, res_1, el, track;
@@ -80,14 +81,14 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
             case 2:
                 count = 0;
                 res = [];
-                while (count < 5) {
+                while (count < 10) {
                     res.push(data[i++]);
                     count++;
                 }
                 for (_i = 0, res_1 = res; _i < res_1.length; _i++) {
                     el = res_1[_i];
                     track = document.createElement('div');
-                    track.innerHTML = "\n            <div style='height: 20em;'>" + el['artists'][0]['name'] + ": " + el['name'] + "</div>\n        ";
+                    track.innerHTML = "\n            <div style='height: 20em;'>" + ++trackPosition + " - " + el['artists'][0]['name'] + ": " + el['name'] + "</div>\n        ";
                     root === null || root === void 0 ? void 0 : root.appendChild(track);
                 }
                 return [2 /*return*/];

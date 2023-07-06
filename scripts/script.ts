@@ -7,7 +7,8 @@ let j: number = 0;
 let isFetching: boolean = false;
 let accessToken = '';
 let data: any[] = [];
-let limitReached: boolean = false
+let limitReached: boolean = false;
+let trackPosition: number = 0;
 
 // Functions
 const fetchData = async () => {
@@ -43,7 +44,7 @@ const fetchData = async () => {
     let count = 0;
     let res = [];
 
-    while (count < 5) {
+    while (count < 10) {
         res.push(data[i++]);
         count++;
     }
@@ -51,7 +52,7 @@ const fetchData = async () => {
     for (const el of res) {
         const track = document.createElement('div');
         track.innerHTML = `
-            <div style='height: 20em;'>${el['artists'][0]['name']}: ${el['name']}</div>
+            <div style='height: 20em;'>${++trackPosition} - ${el['artists'][0]['name']}: ${el['name']}</div>
         `;
         root?.appendChild(track);
     }
