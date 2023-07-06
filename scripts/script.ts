@@ -17,7 +17,6 @@ const fetchData = async () => {
     if (j >= 50) {
         let h1 = document.createElement('h1');
         h1.style.textAlign = 'center';
-        h1.style.color = '#FFF';
         h1.innerHTML = 'That\s all folks!';
         root?.appendChild(h1);
         limitReached = true;
@@ -58,7 +57,6 @@ const fetchData = async () => {
         track.style.textAlign = 'center';
         track.style.fontSize = '2.5em';
         track.style.background = '#191414';
-        track.style.color = '#FFF';
         track.innerHTML = `
             <div>${++trackPosition} - ${el['artists'][0]['name']}: ${el['name']}</div>
         `;
@@ -108,7 +106,10 @@ window.addEventListener('load', () => {
         const input = document.createElement('input');
         input.placeholder = 'Spotify Access Token';
         const btn = document.createElement('button');
+        btn.style.marginTop = '0.5em';
+        btn.style.background = '#191414';
         btn.innerHTML = 'Submit';
+        btn.style.fontSize = '1.5em';
         btn.onclick = submitToken;
 
         container.appendChild(input);

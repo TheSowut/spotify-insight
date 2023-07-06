@@ -5,3 +5,7 @@ body {
 h2 {
     font-size: 2em;
 }
+
+div, button {
+    color: #FFF;
+}
