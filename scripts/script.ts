@@ -95,7 +95,7 @@ const setAccessToken = () => {
 * @returns
 */
 const submitToken = async () => {
-          accessToken = document.querySelector('input')!.value;
+    accessToken = document.querySelector('input')!.value;
     const res         = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=${endPos + 10}`, {
         headers: {
             Authorization: `Bearer ${accessToken}`
@@ -126,6 +126,8 @@ const displayLogin = async () => {
 
     const input             = document.createElement('input');
           input.placeholder = 'Spotify Access Token';
+          input.type = 'password';
+          input.inputMode = 'password';
     const btn               = document.createElement('button');
           btn.innerHTML     = 'Submit';
           btn.onclick       = submitToken;
