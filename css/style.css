@@ -4,7 +4,7 @@
 }
 
 body {
-    background-color: #1DB954;
+    background: #1DB954;
 }
 
 h2 {
@@ -14,6 +14,26 @@ h2 {
 div,
 button {
     color: #FFF;
+}
+
+input {
+    font-weight: 400;
+}
+
+button {
+    margin-top: 0.5em;
+    background: #191414;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #110e0e;
+    transition: .3s all;
+}
+
+footer {
+    font-style: italic;
 }
 
 #main-container {
@@ -37,18 +57,14 @@ button {
     align-items: center;
 }
 
-input {
-    font-weight: 400;
-}
-
-button {
-    margin-top: 0.5em;
+#track, footer {
+    margin-top: 6%;
+    text-align: center;
+    font-size: 2.5em;
     background: #191414;
-    font-size: 1.5em;
-    cursor: pointer;
-}
+    width: 90%;
 
-button:hover {
-    background-color: #110e0e;
-    transition: .3s all;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 }

@@ -15,10 +15,11 @@ const fetchData = async () => {
     if (limitReached || isFetching) return;
 
     if (j >= 50) {
-        let h1 = document.createElement('h1');
-        h1.style.textAlign = 'center';
-        h1.innerHTML = 'That\s all folks!';
-        root?.appendChild(h1);
+        let footer = document.createElement('footer');
+        footer.style.textAlign = 'center';
+        footer.innerHTML = 'That\'s all folks!';
+
+        root?.appendChild(footer);
         limitReached = true;
         return;
     }
@@ -52,17 +53,9 @@ const fetchData = async () => {
 
     for (const el of res) {
         const track = document.createElement('div');
-        track.style.marginTop = '5%';
-        track.style.padding = '2%;';
-        track.style.textAlign = 'center';
-        track.style.fontSize = '2.5em';
-        track.style.background = '#191414';
-        track.style.width = '90%';
-        track.style.display = 'flex';
-        track.style.flexDirection = 'row';
-        track.style.justifyContent = 'center';
+        track.id = 'track';
         track.innerHTML = `
-            <div>${++trackPosition} - ${el['artists'][0]['name']}: ${el['name']}</div>
+            <div>${++trackPosition}. ${el['artists'][0]['name']} - ${el['name']}</div>
         `;
         root?.appendChild(track);
     }

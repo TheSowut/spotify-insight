@@ -47,17 +47,17 @@ var limitReached = false;
 var trackPosition = 0;
 // Functions
 var fetchData = function () { return __awaiter(_this, void 0, void 0, function () {
-    var h1, response, count, res, _i, res_1, el, track;
+    var footer, response, count, res, _i, res_1, el, track;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 if (limitReached || isFetching)
                     return [2 /*return*/];
                 if (j >= 50) {
-                    h1 = document.createElement('h1');
-                    h1.style.textAlign = 'center';
-                    h1.innerHTML = 'That\s all folks!';
-                    root === null || root === void 0 ? void 0 : root.appendChild(h1);
+                    footer = document.createElement('footer');
+                    footer.style.textAlign = 'center';
+                    footer.innerHTML = 'That\'s all folks!';
+                    root === null || root === void 0 ? void 0 : root.appendChild(footer);
                     limitReached = true;
                     return [2 /*return*/];
                 }
@@ -89,16 +89,8 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
                 for (_i = 0, res_1 = res; _i < res_1.length; _i++) {
                     el = res_1[_i];
                     track = document.createElement('div');
-                    track.style.marginTop = '5%';
-                    track.style.padding = '2%;';
-                    track.style.textAlign = 'center';
-                    track.style.fontSize = '2.5em';
-                    track.style.background = '#191414';
-                    track.style.width = '90%';
-                    track.style.display = 'flex';
-                    track.style.flexDirection = 'row';
-                    track.style.justifyContent = 'center';
-                    track.innerHTML = "\n            <div>" + ++trackPosition + " - " + el['artists'][0]['name'] + ": " + el['name'] + "</div>\n        ";
+                    track.id = 'track';
+                    track.innerHTML = "\n            <div>" + ++trackPosition + ". " + el['artists'][0]['name'] + " - " + el['name'] + "</div>\n        ";
                     root === null || root === void 0 ? void 0 : root.appendChild(track);
                 }
                 return [2 /*return*/];
