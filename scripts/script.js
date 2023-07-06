@@ -76,9 +76,8 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
                     limitReached = true;
                     return [2 /*return*/];
                 }
-                if (!accessToken.length) {
+                if (!accessToken.length)
                     setAccessToken();
-                }
                 if (startPos === endPos)
                     data = [];
                 if (!!data.length) return [3 /*break*/, 2];
@@ -96,6 +95,7 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
                     displayLogin();
                     return [2 /*return*/];
                 }
+                updateWebsiteTitle();
                 data = response.items;
                 endPos = data.length;
                 isFetching = false;
@@ -174,6 +174,12 @@ var displayLogin = function () { return __awaiter(_this, void 0, void 0, functio
         return [2 /*return*/];
     });
 }); };
+/**
+ * Pick a random musical emoji and prefix it to the website title.
+ */
+var updateWebsiteTitle = function () {
+    document.title = emojis[Math.floor(Math.random() * emojis.length)] + " Spotify Insight";
+};
 /**
 * Check if the user has an access token stored in the local storage.
 * If yes, perform the fetch, if not, display the "login" screen.

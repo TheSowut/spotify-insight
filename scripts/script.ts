@@ -1,4 +1,4 @@
-    // Constants
+// Constants
 const root   = document.querySelector('#root');
 const emojis = [
     '🎼',
@@ -12,7 +12,7 @@ const emojis = [
     '🎻'
 ];
 
-    // Variables
+// Variables
 let startPos: number      = 0;
 let endPos: number        = 0;
 let isFetching: boolean   = false;
@@ -21,7 +21,7 @@ let data: any[]           = [];
 let limitReached: boolean = false;
 let trackPosition: number = 0;
 
-    /**
+/**
 * If limit has been reached or a fetch request is being performed, exit.
 * Otherwise validate user access token and perform the API call.
 * @returns
@@ -39,14 +39,11 @@ const fetchData = async () => {
         return;
     }
 
-    if (!accessToken.length) {
-        setAccessToken();
-    }
-
+    if (!accessToken.length) setAccessToken();
     if (startPos === endPos) data = [];
 
     if (!data.length) {
-              isFetching = true;
+        isFetching = true;
         const response   = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=${endPos + 10}`, {
             headers: {
                 Authorization: `Bearer ${accessToken}`
@@ -60,6 +57,7 @@ const fetchData = async () => {
             return;
         }
 
+        updateWebsiteTitle();
         data       = response.items;
         endPos     = data.length;
         isFetching = false;
@@ -91,7 +89,7 @@ const setAccessToken = () => {
     accessToken = localStorage.getItem('access_token')!;
 }
 
-    /**
+/**
 * After the user has submitted his access token, try to perform an API call
 * to fetch his top tracks. If it fails, display an error message.
 * @returns
@@ -116,7 +114,7 @@ const submitToken = async () => {
     fetchData();
 }
 
-    /**
+/**
 * Display the access token input field.
 */
 const displayLogin = async () => {
@@ -138,7 +136,14 @@ const displayLogin = async () => {
     root?.appendChild(mainContainer);
 }
 
-    /**
+/**
+ * Pick a random musical emoji and prefix it to the website title.
+ */
+const updateWebsiteTitle = () => {
+    document.title = `${emojis[Math.floor(Math.random() * emojis.length)]} Spotify Insight`;
+}
+
+/**
 * Check if the user has an access token stored in the local storage.
 * If yes, perform the fetch, if not, display the "login" screen.
 */
@@ -151,7 +156,7 @@ window.addEventListener('load', () => {
     fetchData();
 });
 
-    /**
+/**
 * When the users performs a mouse scroll, check his location.
 * If he has reached the end of the page and has tracks left, fetch the data.
 */
