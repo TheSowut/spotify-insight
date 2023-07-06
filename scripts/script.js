@@ -124,8 +124,7 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
 }); };
 // Event Listeners
 window.addEventListener('load', function () {
-    localStorage.clear();
-    if (!localStorage.getItem('test')) {
+    if (!localStorage.getItem('access_token')) {
         var mainContainer = document.createElement('div');
         mainContainer.style.display = 'flex';
         mainContainer.style.flexDirection = 'row';

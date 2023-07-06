@@ -82,8 +82,7 @@ const submitToken = async () => {
 
 // Event Listeners
 window.addEventListener('load', () => {
-    localStorage.clear();
-    if (!localStorage.getItem('test')) {
+    if (!localStorage.getItem('access_token')) {
         const mainContainer = document.createElement('div');
         mainContainer.style.display = 'flex';
         mainContainer.style.flexDirection = 'row';
