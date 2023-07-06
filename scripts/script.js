@@ -123,7 +123,7 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
                 }
                 localStorage.setItem('access_token', accessToken);
                 setAccessToken();
-                root === null || root === void 0 ? void 0 : root.removeChild(document.querySelector('#mainContainer'));
+                root === null || root === void 0 ? void 0 : root.removeChild(document.querySelector('#main-container'));
                 fetchData();
                 return [2 /*return*/];
         }
@@ -133,23 +133,13 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
 window.addEventListener('load', function () {
     if (!localStorage.getItem('access_token')) {
         var mainContainer = document.createElement('div');
-        mainContainer.style.display = 'flex';
-        mainContainer.style.flexDirection = 'row';
-        mainContainer.style.justifyContent = 'center';
-        mainContainer.style.height = '80vh';
-        mainContainer.id = 'mainContainer';
+        mainContainer.id = 'main-container';
         var container = document.createElement('div');
-        container.style.display = 'flex';
-        container.style.flexDirection = 'column';
-        container.style.width = '15%';
-        container.style.justifyContent = 'center';
+        container.id = 'container';
         var input = document.createElement('input');
         input.placeholder = 'Spotify Access Token';
         var btn = document.createElement('button');
-        btn.style.marginTop = '0.5em';
-        btn.style.background = '#191414';
         btn.innerHTML = 'Submit';
-        btn.style.fontSize = '1.5em';
         btn.onclick = submitToken;
         container.appendChild(input);
         container.appendChild(btn);

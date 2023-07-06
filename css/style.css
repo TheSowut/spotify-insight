@@ -9,3 +9,24 @@ h2 {
 div, button {
     color: #FFF;
 }
+
+#main-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 80vh;
+}
+
+#container {
+    width: 15%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+button {
+    margin-top: 0.5em;
+    background: #191414;
+    font-size: 1.5em;
+    cursor: pointer;
+}
