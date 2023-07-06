@@ -38,14 +38,18 @@ var _this = this;
 // Constants
 var root = document.querySelector('#root');
 // Variables
-var i = 0;
-var j = 0;
+var startPos = 0;
+var endPos = 0;
 var isFetching = false;
 var accessToken = '';
 var data = [];
 var limitReached = false;
 var trackPosition = 0;
-// Functions
+/**
+ * If limit has been reached or a fetch request is being performed, exit.
+ * Otherwise validate user access token and perform the API call.
+ * @returns
+ */
 var fetchData = function () { return __awaiter(_this, void 0, void 0, function () {
     var footer, response, count, res, _i, res_1, el, track;
     return __generator(this, function (_a) {
@@ -53,7 +57,7 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
             case 0:
                 if (limitReached || isFetching)
                     return [2 /*return*/];
-                if (j >= 50) {
+                if (endPos >= 50) {
                     footer = document.createElement('footer');
                     footer.style.textAlign = 'center';
                     footer.innerHTML = 'That\'s all folks!';
@@ -64,26 +68,32 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
                 if (!accessToken.length) {
                     setAccessToken();
                 }
-                if (i === j)
+                if (startPos === endPos)
                     data = [];
                 if (!!data.length) return [3 /*break*/, 2];
                 isFetching = true;
-                return [4 /*yield*/, fetch("https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=" + (j + 10), {
+                return [4 /*yield*/, fetch("https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=" + (endPos + 10), {
                         headers: {
                             Authorization: "Bearer " + accessToken
                         }
                     }).then(function (res) { return res.json(); })];
             case 1:
                 response = _a.sent();
+                if (response.error) {
+                    alert(response.error.message);
+                    localStorage.clear();
+                    displayLogin();
+                    return [2 /*return*/];
+                }
                 data = response.items;
-                j = data.length;
+                endPos = data.length;
                 isFetching = false;
                 _a.label = 2;
             case 2:
                 count = 0;
                 res = [];
                 while (count < 10) {
-                    res.push(data[i++]);
+                    res.push(data[startPos++]);
                     count++;
                 }
                 for (_i = 0, res_1 = res; _i < res_1.length; _i++) {
@@ -100,13 +110,18 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
 var setAccessToken = function () {
     accessToken = localStorage.getItem('access_token');
 };
+/**
+ * After the user has submitted his access token, try to perform an API call
+ * to fetch his top tracks. If it fails, display an error message.
+ * @returns
+ */
 var submitToken = function () { return __awaiter(_this, void 0, void 0, function () {
     var res;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 accessToken = document.querySelector('input').value;
-                return [4 /*yield*/, fetch("https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=" + (j + 10), {
+                return [4 /*yield*/, fetch("https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=" + (endPos + 10), {
                         headers: {
                             Authorization: "Bearer " + accessToken
                         }
@@ -114,6 +129,7 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
             case 1:
                 res = _a.sent();
                 if (res.status !== 200) {
+                    localStorage.clear();
                     alert('Wrong Access Token!');
                     return [2 /*return*/];
                 }
@@ -125,26 +141,43 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
         }
     });
 }); };
-// Event Listeners
-window.addEventListener('load', function () {
-    if (!localStorage.getItem('access_token')) {
-        var mainContainer = document.createElement('div');
+/**
+ * Display the access token input field.
+ */
+var displayLogin = function () { return __awaiter(_this, void 0, void 0, function () {
+    var mainContainer, container, input, btn;
+    return __generator(this, function (_a) {
+        mainContainer = document.createElement('div');
         mainContainer.id = 'main-container';
-        var container = document.createElement('div');
+        container = document.createElement('div');
         container.id = 'container';
-        var input = document.createElement('input');
+        input = document.createElement('input');
         input.placeholder = 'Spotify Access Token';
-        var btn = document.createElement('button');
+        btn = document.createElement('button');
         btn.innerHTML = 'Submit';
         btn.onclick = submitToken;
         container.appendChild(input);
         container.appendChild(btn);
         mainContainer.appendChild(container);
         root === null || root === void 0 ? void 0 : root.appendChild(mainContainer);
+        return [2 /*return*/];
+    });
+}); };
+/**
+ * Check if the user has an access token stored in the local storage.
+ * If yes, perform the fetch, if not, display the "login" screen.
+ */
+window.addEventListener('load', function () {
+    if (!localStorage.getItem('access_token')) {
+        displayLogin();
         return;
     }
     fetchData();
 });
+/**
+ * When the users performs a mouse scroll, check his location.
+ * If he has reached the end of the page and has tracks left, fetch the data.
+ */
 window.addEventListener('scroll', function () {
     if (isFetching)
         return;

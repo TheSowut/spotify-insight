@@ -2,19 +2,23 @@
 const root = document.querySelector('#root');
 
 // Variables
-let i: number = 0;
-let j: number = 0;
+let startPos: number = 0;
+let endPos: number = 0;
 let isFetching: boolean = false;
 let accessToken = '';
 let data: any[] = [];
 let limitReached: boolean = false;
 let trackPosition: number = 0;
 
-// Functions
+/**
+ * If limit has been reached or a fetch request is being performed, exit.
+ * Otherwise validate user access token and perform the API call.
+ * @returns
+ */
 const fetchData = async () => {
     if (limitReached || isFetching) return;
 
-    if (j >= 50) {
+    if (endPos >= 50) {
         let footer = document.createElement('footer');
         footer.style.textAlign = 'center';
         footer.innerHTML = 'That\'s all folks!';
@@ -28,18 +32,25 @@ const fetchData = async () => {
         setAccessToken();
     }
 
-    if (i === j) data = [];
+    if (startPos === endPos) data = [];
 
     if (!data.length) {
         isFetching = true;
-        const response = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=${j + 10}`, {
+        const response = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=${endPos + 10}`, {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
         }).then(res => res.json());
 
+        if (response.error) {
+            alert(response.error.message);
+            localStorage.clear();
+            displayLogin();
+            return;
+        }
+
         data = response.items;
-        j = data.length;
+        endPos = data.length;
         isFetching = false;
     }
 
@@ -47,7 +58,7 @@ const fetchData = async () => {
     let res = [];
 
     while (count < 10) {
-        res.push(data[i++]);
+        res.push(data[startPos++]);
         count++;
     }
 
@@ -65,15 +76,21 @@ const setAccessToken = () => {
     accessToken = localStorage.getItem('access_token')!;
 }
 
+/**
+ * After the user has submitted his access token, try to perform an API call
+ * to fetch his top tracks. If it fails, display an error message.
+ * @returns
+ */
 const submitToken = async () => {
     accessToken = document.querySelector('input')!.value;
-    const res = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=${j + 10}`, {
+    const res = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=${endPos + 10}`, {
         headers: {
             Authorization: `Bearer ${accessToken}`
         }
     });
 
     if (res.status !== 200) {
+        localStorage.clear();
         alert('Wrong Access Token!');
         return;
     }
@@ -84,31 +101,45 @@ const submitToken = async () => {
     fetchData();
 }
 
-// Event Listeners
+/**
+ * Display the access token input field.
+ */
+const displayLogin = async () => {
+    const mainContainer = document.createElement('div');
+    mainContainer.id = 'main-container';
+
+    const container = document.createElement('div');
+    container.id = 'container';
+
+    const input = document.createElement('input');
+    input.placeholder = 'Spotify Access Token';
+    const btn = document.createElement('button');
+    btn.innerHTML = 'Submit';
+    btn.onclick = submitToken;
+
+    container.appendChild(input);
+    container.appendChild(btn);
+    mainContainer.appendChild(container);
+    root?.appendChild(mainContainer);
+}
+
+/**
+ * Check if the user has an access token stored in the local storage.
+ * If yes, perform the fetch, if not, display the "login" screen.
+ */
 window.addEventListener('load', () => {
     if (!localStorage.getItem('access_token')) {
-        const mainContainer = document.createElement('div');
-        mainContainer.id = 'main-container';
-
-        const container = document.createElement('div');
-        container.id = 'container';
-
-        const input = document.createElement('input');
-        input.placeholder = 'Spotify Access Token';
-        const btn = document.createElement('button');
-        btn.innerHTML = 'Submit';
-        btn.onclick = submitToken;
-
-        container.appendChild(input);
-        container.appendChild(btn);
-        mainContainer.appendChild(container);
-        root?.appendChild(mainContainer);
+        displayLogin();
         return;
     }
 
     fetchData();
 });
 
+/**
+ * When the users performs a mouse scroll, check his location.
+ * If he has reached the end of the page and has tracks left, fetch the data.
+ */
 window.addEventListener('scroll', () => {
     if (isFetching) return;
 
