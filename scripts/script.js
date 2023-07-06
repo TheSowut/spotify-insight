@@ -110,7 +110,7 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
                 for (_i = 0, trackList_1 = trackList; _i < trackList_1.length; _i++) {
                     track = trackList_1[_i];
                     trackElement = document.createElement('div');
-                    trackElement.id = 'track';
+                    trackElement.classList.add('track');
                     trackElement.innerHTML = "\n            <div>\n                <a href = \"" + track['uri'] + "\" target = \"_blank\">\n                    " + ++trackPosition + ". " + track['artists'][0]['name'] + " - " + track['name'] + "\n                </a>\n            </div>\n        ";
                     root === null || root === void 0 ? void 0 : root.appendChild(trackElement);
                 }
@@ -142,13 +142,13 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
                 res = _a.sent();
                 if (res.status !== 200) {
                     localStorage.clear();
-                    alert('Wrong Access Token!');
+                    alert('Invalid access token!');
                     tokenField.value = "";
                     return [2 /*return*/];
                 }
                 localStorage.setItem('access_token', accessToken);
                 setAccessToken();
-                root === null || root === void 0 ? void 0 : root.removeChild(document.querySelector('#main-container'));
+                root === null || root === void 0 ? void 0 : root.removeChild(document.querySelector('.main-container'));
                 fetchData();
                 return [2 /*return*/];
         }
@@ -161,15 +161,13 @@ var displayLogin = function () { return __awaiter(_this, void 0, void 0, functio
     var mainContainer, container, obtainToken, input, btn;
     return __generator(this, function (_a) {
         mainContainer = document.createElement('div');
-        mainContainer.id = 'main-container';
+        mainContainer.classList.add('main-container');
         container = document.createElement('div');
-        container.id = 'container';
+        container.classList.add('container');
         obtainToken = document.createElement('a');
+        obtainToken.classList.add('obtain-token-link');
         obtainToken.href = 'https://developer.spotify.com/';
         obtainToken.innerHTML = 'Obtain token';
-        obtainToken.style.fontWeight = '400';
-        obtainToken.style.textDecoration = 'underline';
-        obtainToken.style.textAlign = 'end';
         obtainToken.target = '_blank';
         input = document.createElement('input');
         input.placeholder = 'Spotify Access Token';

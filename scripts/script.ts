@@ -73,7 +73,7 @@ const fetchData = async () => {
 
     for (const track of trackList) {
         const trackElement           = document.createElement('div');
-              trackElement.id        = 'track';
+              trackElement.classList.add('track');
               trackElement.innerHTML = `
             <div>
                 <a href = "${track['uri']}" target = "_blank">
@@ -105,14 +105,14 @@ const submitToken = async () => {
 
     if (res.status !== 200) {
         localStorage.clear();
-        alert('Wrong Access Token!');
+        alert('Invalid access token!');
         tokenField!.value = "";
         return;
     }
 
     localStorage.setItem('access_token', accessToken);
     setAccessToken();
-    root?.removeChild(document.querySelector('#main-container')!);
+    root?.removeChild(document.querySelector('.main-container')!);
     fetchData();
 }
 
@@ -120,18 +120,16 @@ const submitToken = async () => {
 * Display the access token input field.
 */
 const displayLogin = async () => {
-    const mainContainer    = document.createElement('div');
-          mainContainer.id = 'main-container';
+    const mainContainer = document.createElement('div');
+          mainContainer.classList.add('main-container');
 
-    const container    = document.createElement('div');
-          container.id = 'container';
+    const container = document.createElement('div');
+          container.classList.add('container');
 
     const obtainToken = document.createElement('a');
+    obtainToken.classList.add('obtain-token-link');
     obtainToken.href = 'https://developer.spotify.com/';
     obtainToken.innerHTML = 'Obtain token';
-    obtainToken.style.fontWeight = '400';
-    obtainToken.style.textDecoration = 'underline';
-    obtainToken.style.textAlign = 'end';
     obtainToken.target = '_blank';
 
     const input             = document.createElement('input');
