@@ -38,40 +38,120 @@ var _this = this;
 // Constants
 var root = document.querySelector('#root');
 // Variables
-var currentPage = 1;
+var i = 0;
+var j = 0;
 var isFetching = false;
-var hasMore = true;
+var accessToken = '';
+var data = [];
+var limitReached = false;
 // Functions
 var fetchData = function () { return __awaiter(_this, void 0, void 0, function () {
-    var response, _i, response_1, x, post;
+    var h1, response, count, res, _i, res_1, el, track;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                isFetching = true;
-                return [4 /*yield*/, fetch("https://jsonplaceholder.typicode.com/posts?_page=" + currentPage)
-                        .then(function (res) { return res.json(); })];
-            case 1:
-                response = _a.sent();
-                isFetching = false;
-                if (!response.length) {
-                    hasMore = false;
+                if (limitReached || isFetching)
+                    return [2 /*return*/];
+                if (j >= 50) {
+                    h1 = document.createElement('h1');
+                    h1.innerHTML = 'That\s all folks!';
+                    root === null || root === void 0 ? void 0 : root.appendChild(h1);
+                    limitReached = true;
                     return [2 /*return*/];
                 }
-                for (_i = 0, response_1 = response; _i < response_1.length; _i++) {
-                    x = response_1[_i];
-                    post = document.createElement('div');
-                    post.innerHTML = "\n            <h2>" + x.title + "</h2>\n            <p>" + x.body + "</p>\n        ";
-                    root === null || root === void 0 ? void 0 : root.appendChild(post);
+                if (!accessToken.length) {
+                    setAccessToken();
                 }
-                currentPage++;
+                if (i === j)
+                    data = [];
+                if (!!data.length) return [3 /*break*/, 2];
+                isFetching = true;
+                return [4 /*yield*/, fetch("https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=" + (j + 10), {
+                        headers: {
+                            Authorization: "Bearer " + accessToken
+                        }
+                    }).then(function (res) { return res.json(); })];
+            case 1:
+                response = _a.sent();
+                data = response.items;
+                j = data.length;
+                isFetching = false;
+                _a.label = 2;
+            case 2:
+                count = 0;
+                res = [];
+                while (count < 5) {
+                    res.push(data[i++]);
+                    count++;
+                }
+                for (_i = 0, res_1 = res; _i < res_1.length; _i++) {
+                    el = res_1[_i];
+                    track = document.createElement('div');
+                    track.innerHTML = "\n            <div style='height: 20em;'>" + el['artists'][0]['name'] + ": " + el['name'] + "</div>\n        ";
+                    root === null || root === void 0 ? void 0 : root.appendChild(track);
+                }
+                return [2 /*return*/];
+        }
+    });
+}); };
+var setAccessToken = function () {
+    accessToken = localStorage.getItem('access_token');
+};
+var submitToken = function () { return __awaiter(_this, void 0, void 0, function () {
+    var res;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                accessToken = document.querySelector('input').value;
+                return [4 /*yield*/, fetch("https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=" + (j + 10), {
+                        headers: {
+                            Authorization: "Bearer " + accessToken
+                        }
+                    })];
+            case 1:
+                res = _a.sent();
+                if (res.status !== 200) {
+                    alert('Wrong Access Token!');
+                    return [2 /*return*/];
+                }
+                localStorage.setItem('access_token', accessToken);
+                setAccessToken();
+                root === null || root === void 0 ? void 0 : root.removeChild(document.querySelector('#mainContainer'));
+                fetchData();
                 return [2 /*return*/];
         }
     });
 }); };
 // Event Listeners
-window.addEventListener('load', function () { return fetchData(); });
+window.addEventListener('load', function () {
+    localStorage.clear();
+    if (!localStorage.getItem('test')) {
+        var mainContainer = document.createElement('div');
+        mainContainer.style.display = 'flex';
+        mainContainer.style.flexDirection = 'row';
+        mainContainer.style.justifyContent = 'center';
+        mainContainer.style.height = '80vh';
+        mainContainer.id = 'mainContainer';
+        var container = document.createElement('div');
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.width = '15%';
+        container.style.justifyContent = 'center';
+        var input = document.createElement('input');
+        input.placeholder = 'Spotify Access Token';
+        var btn = document.createElement('button');
+        btn.innerHTML = 'Submit';
+        btn.onclick = submitToken;
+        container.appendChild(input);
+        container.appendChild(btn);
+        mainContainer.appendChild(container);
+        root === null || root === void 0 ? void 0 : root.appendChild(mainContainer);
+        return;
+    }
+    fetchData();
+});
 window.addEventListener('scroll', function () {
-    if (isFetching || !hasMore)
+    if (isFetching)
         return;
     var currentPageHeight = window.innerHeight + window.scrollY;
     if (currentPageHeight >= document.body.offsetHeight)
