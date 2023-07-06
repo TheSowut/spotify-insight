@@ -16,6 +16,8 @@ const fetchData = async () => {
 
     if (j >= 50) {
         let h1 = document.createElement('h1');
+        h1.style.textAlign = 'center';
+        h1.style.color = '#FFF';
         h1.innerHTML = 'That\s all folks!';
         root?.appendChild(h1);
         limitReached = true;
@@ -51,8 +53,14 @@ const fetchData = async () => {
 
     for (const el of res) {
         const track = document.createElement('div');
+        track.style.marginTop = '5%';
+        track.style.padding = '2%;';
+        track.style.textAlign = 'center';
+        track.style.fontSize = '2.5em';
+        track.style.background = '#191414';
+        track.style.color = '#FFF';
         track.innerHTML = `
-            <div style='height: 20em;'>${++trackPosition} - ${el['artists'][0]['name']}: ${el['name']}</div>
+            <div>${++trackPosition} - ${el['artists'][0]['name']}: ${el['name']}</div>
         `;
         root?.appendChild(track);
     }

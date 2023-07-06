@@ -55,6 +55,8 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
                     return [2 /*return*/];
                 if (j >= 50) {
                     h1 = document.createElement('h1');
+                    h1.style.textAlign = 'center';
+                    h1.style.color = '#FFF';
                     h1.innerHTML = 'That\s all folks!';
                     root === null || root === void 0 ? void 0 : root.appendChild(h1);
                     limitReached = true;
@@ -88,7 +90,13 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
                 for (_i = 0, res_1 = res; _i < res_1.length; _i++) {
                     el = res_1[_i];
                     track = document.createElement('div');
-                    track.innerHTML = "\n            <div style='height: 20em;'>" + ++trackPosition + " - " + el['artists'][0]['name'] + ": " + el['name'] + "</div>\n        ";
+                    track.style.marginTop = '5%';
+                    track.style.padding = '2%;';
+                    track.style.textAlign = 'center';
+                    track.style.fontSize = '2.5em';
+                    track.style.background = '#191414';
+                    track.style.color = '#FFF';
+                    track.innerHTML = "\n            <div>" + ++trackPosition + " - " + el['artists'][0]['name'] + ": " + el['name'] + "</div>\n        ";
                     root === null || root === void 0 ? void 0 : root.appendChild(track);
                 }
                 return [2 /*return*/];
