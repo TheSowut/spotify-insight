@@ -37,6 +37,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var _this = this;
 // Constants
 var root = document.querySelector('#root');
+var emojis = [
+    '🎼',
+    '🎵',
+    '🎶',
+    '🎧',
+    '🎸',
+    '🎹',
+    '🎷',
+    '🎺',
+    '🎻'
+];
 // Variables
 var startPos = 0;
 var endPos = 0;
@@ -46,12 +57,12 @@ var data = [];
 var limitReached = false;
 var trackPosition = 0;
 /**
- * If limit has been reached or a fetch request is being performed, exit.
- * Otherwise validate user access token and perform the API call.
- * @returns
- */
+* If limit has been reached or a fetch request is being performed, exit.
+* Otherwise validate user access token and perform the API call.
+* @returns
+*/
 var fetchData = function () { return __awaiter(_this, void 0, void 0, function () {
-    var footer, response, count, res, _i, res_1, el, track;
+    var footer, response, count, trackList, _i, trackList_1, track, trackElement;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -91,17 +102,17 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
                 _a.label = 2;
             case 2:
                 count = 0;
-                res = [];
+                trackList = [];
                 while (count < 10) {
-                    res.push(data[startPos++]);
+                    trackList.push(data[startPos++]);
                     count++;
                 }
-                for (_i = 0, res_1 = res; _i < res_1.length; _i++) {
-                    el = res_1[_i];
-                    track = document.createElement('div');
-                    track.id = 'track';
-                    track.innerHTML = "\n            <div>" + ++trackPosition + ". " + el['artists'][0]['name'] + " - " + el['name'] + "</div>\n        ";
-                    root === null || root === void 0 ? void 0 : root.appendChild(track);
+                for (_i = 0, trackList_1 = trackList; _i < trackList_1.length; _i++) {
+                    track = trackList_1[_i];
+                    trackElement = document.createElement('div');
+                    trackElement.id = 'track';
+                    trackElement.innerHTML = "\n            <div>\n                <a href = \"" + track['uri'] + "\" target = \"_blank\">\n                    " + ++trackPosition + ". " + track['artists'][0]['name'] + " - " + track['name'] + "\n                </a>\n            </div>\n        ";
+                    root === null || root === void 0 ? void 0 : root.appendChild(trackElement);
                 }
                 return [2 /*return*/];
         }
@@ -111,10 +122,10 @@ var setAccessToken = function () {
     accessToken = localStorage.getItem('access_token');
 };
 /**
- * After the user has submitted his access token, try to perform an API call
- * to fetch his top tracks. If it fails, display an error message.
- * @returns
- */
+* After the user has submitted his access token, try to perform an API call
+* to fetch his top tracks. If it fails, display an error message.
+* @returns
+*/
 var submitToken = function () { return __awaiter(_this, void 0, void 0, function () {
     var res;
     return __generator(this, function (_a) {
@@ -142,8 +153,8 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
     });
 }); };
 /**
- * Display the access token input field.
- */
+* Display the access token input field.
+*/
 var displayLogin = function () { return __awaiter(_this, void 0, void 0, function () {
     var mainContainer, container, input, btn;
     return __generator(this, function (_a) {
@@ -164,9 +175,9 @@ var displayLogin = function () { return __awaiter(_this, void 0, void 0, functio
     });
 }); };
 /**
- * Check if the user has an access token stored in the local storage.
- * If yes, perform the fetch, if not, display the "login" screen.
- */
+* Check if the user has an access token stored in the local storage.
+* If yes, perform the fetch, if not, display the "login" screen.
+*/
 window.addEventListener('load', function () {
     if (!localStorage.getItem('access_token')) {
         displayLogin();
@@ -175,9 +186,9 @@ window.addEventListener('load', function () {
     fetchData();
 });
 /**
- * When the users performs a mouse scroll, check his location.
- * If he has reached the end of the page and has tracks left, fetch the data.
- */
+* When the users performs a mouse scroll, check his location.
+* If he has reached the end of the page and has tracks left, fetch the data.
+*/
 window.addEventListener('scroll', function () {
     if (isFetching)
         return;
