@@ -127,11 +127,12 @@ var setAccessToken = function () {
 * @returns
 */
 var submitToken = function () { return __awaiter(_this, void 0, void 0, function () {
-    var res;
+    var tokenField, res;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                accessToken = document.querySelector('input').value;
+                tokenField = document.querySelector('input');
+                accessToken = tokenField.value;
                 return [4 /*yield*/, fetch("https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=" + (endPos + 10), {
                         headers: {
                             Authorization: "Bearer " + accessToken
@@ -142,6 +143,7 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
                 if (res.status !== 200) {
                     localStorage.clear();
                     alert('Wrong Access Token!');
+                    tokenField.value = "";
                     return [2 /*return*/];
                 }
                 localStorage.setItem('access_token', accessToken);
@@ -156,12 +158,19 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
 * Display the access token input field.
 */
 var displayLogin = function () { return __awaiter(_this, void 0, void 0, function () {
-    var mainContainer, container, input, btn;
+    var mainContainer, container, obtainToken, input, btn;
     return __generator(this, function (_a) {
         mainContainer = document.createElement('div');
         mainContainer.id = 'main-container';
         container = document.createElement('div');
         container.id = 'container';
+        obtainToken = document.createElement('a');
+        obtainToken.href = 'https://developer.spotify.com/';
+        obtainToken.innerHTML = 'Obtain token';
+        obtainToken.style.fontWeight = '400';
+        obtainToken.style.textDecoration = 'underline';
+        obtainToken.style.textAlign = 'end';
+        obtainToken.target = '_blank';
         input = document.createElement('input');
         input.placeholder = 'Spotify Access Token';
         input.type = 'password';
@@ -169,6 +178,7 @@ var displayLogin = function () { return __awaiter(_this, void 0, void 0, functio
         btn = document.createElement('button');
         btn.innerHTML = 'Submit';
         btn.onclick = submitToken;
+        container.append(obtainToken);
         container.appendChild(input);
         container.appendChild(btn);
         mainContainer.appendChild(container);

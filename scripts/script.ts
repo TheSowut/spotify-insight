@@ -95,8 +95,9 @@ const setAccessToken = () => {
 * @returns
 */
 const submitToken = async () => {
-    accessToken = document.querySelector('input')!.value;
-    const res         = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=${endPos + 10}`, {
+   const tokenField  = document.querySelector('input');
+   accessToken       = tokenField!.value;
+   const res         = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=${endPos + 10}`, {
         headers: {
             Authorization: `Bearer ${accessToken}`
         }
@@ -105,6 +106,7 @@ const submitToken = async () => {
     if (res.status !== 200) {
         localStorage.clear();
         alert('Wrong Access Token!');
+        tokenField!.value = "";
         return;
     }
 
@@ -124,6 +126,14 @@ const displayLogin = async () => {
     const container    = document.createElement('div');
           container.id = 'container';
 
+    const obtainToken = document.createElement('a');
+    obtainToken.href = 'https://developer.spotify.com/';
+    obtainToken.innerHTML = 'Obtain token';
+    obtainToken.style.fontWeight = '400';
+    obtainToken.style.textDecoration = 'underline';
+    obtainToken.style.textAlign = 'end';
+    obtainToken.target = '_blank';
+
     const input             = document.createElement('input');
           input.placeholder = 'Spotify Access Token';
           input.type = 'password';
@@ -132,6 +142,7 @@ const displayLogin = async () => {
           btn.innerHTML     = 'Submit';
           btn.onclick       = submitToken;
 
+    container.append(obtainToken);
     container.appendChild(input);
     container.appendChild(btn);
     mainContainer.appendChild(container);
