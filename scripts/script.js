@@ -94,6 +94,10 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
                     track.style.textAlign = 'center';
                     track.style.fontSize = '2.5em';
                     track.style.background = '#191414';
+                    track.style.width = '90%';
+                    track.style.display = 'flex';
+                    track.style.flexDirection = 'row';
+                    track.style.justifyContent = 'center';
                     track.innerHTML = "\n            <div>" + ++trackPosition + " - " + el['artists'][0]['name'] + ": " + el['name'] + "</div>\n        ";
                     root === null || root === void 0 ? void 0 : root.appendChild(track);
                 }

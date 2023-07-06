@@ -30,6 +30,13 @@ button {
     justify-content: center;
 }
 
+#root {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 input {
     font-weight: 400;
 }
@@ -39,4 +46,9 @@ button {
     background: #191414;
     font-size: 1.5em;
     cursor: pointer;
+}
+
+button:hover {
+    background-color: #110e0e;
+    transition: .3s all;
 }

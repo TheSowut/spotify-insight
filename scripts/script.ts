@@ -57,6 +57,10 @@ const fetchData = async () => {
         track.style.textAlign = 'center';
         track.style.fontSize = '2.5em';
         track.style.background = '#191414';
+        track.style.width = '90%';
+        track.style.display = 'flex';
+        track.style.flexDirection = 'row';
+        track.style.justifyContent = 'center';
         track.innerHTML = `
             <div>${++trackPosition} - ${el['artists'][0]['name']}: ${el['name']}</div>
         `;
