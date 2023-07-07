@@ -34,10 +34,19 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 var _this = this;
 // Constants
 var root = document.querySelector('#root');
-var fetchUrl = 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50';
+var fetchUrl = 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=10&offset=';
 var emojis = [
     '🎼',
     '🎵',
@@ -50,7 +59,6 @@ var emojis = [
     '🎻'
 ];
 // Variables
-var startPos = 0;
 var totalCount = 0;
 var isFetching = false;
 var accessToken = '';
@@ -75,16 +83,9 @@ var renderTracksView = function () { return __awaiter(_this, void 0, void 0, fun
                 }
                 if (!accessToken.length)
                     setAccessToken();
-                if (!!data.length) return [3 /*break*/, 2];
                 return [4 /*yield*/, fetchData()];
             case 1:
-                _a.sent();
-                _a.label = 2;
-            case 2:
-                trackList = data.slice(startPos, startPos + 10);
-                startPos += trackList.length;
-                console.log({ startPos: startPos });
-                console.log({ trackList: trackList });
+                trackList = _a.sent();
                 totalCount += trackList.length;
                 for (_i = 0, trackList_1 = trackList; _i < trackList_1.length; _i++) {
                     track = trackList_1[_i];
@@ -112,7 +113,7 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
             case 0:
                 tokenField = document.querySelector('input');
                 accessToken = tokenField.value;
-                return [4 /*yield*/, fetch(fetchUrl, {
+                return [4 /*yield*/, fetch("" + fetchUrl + totalCount, {
                         headers: {
                             Authorization: "Bearer " + accessToken
                         }
@@ -215,7 +216,7 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
         switch (_a.label) {
             case 0:
                 toggleSpinner();
-                return [4 /*yield*/, fetch(fetchUrl, {
+                return [4 /*yield*/, fetch("" + fetchUrl + totalCount, {
                         headers: {
                             Authorization: "Bearer " + accessToken
                         }
@@ -232,10 +233,10 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
                 return [2 /*return*/];
             case 3:
                 updateWebsiteTitle();
-                data = response.items;
+                data = __spreadArray(__spreadArray([], data, true), [response.items], false);
                 isFetching = false;
                 toggleSpinner();
-                return [2 /*return*/];
+                return [2 /*return*/, response.items];
         }
     });
 }); };

@@ -1,7 +1,7 @@
 // Constants
-const root = document.querySelector('#root');
-const fetchUrl: string = 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50';
-const emojis = [
+const ROOT = document.querySelector('#root');
+const FETCH_URL: string = 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=10&offset=';
+const EMOJIS = [
     '🎼',
     '🎵',
     '🎶',
@@ -12,9 +12,9 @@ const emojis = [
     '🎺',
     '🎻'
 ];
+const MAX_AMOUNT_OF_TRACKS: number = 50;
 
 // Variables
-let startPos: number = 0;
 let totalCount: number = 0;
 let isFetching: boolean = false;
 let accessToken: string = '';
@@ -30,18 +30,14 @@ let trackPosition: number = 0;
 const renderTracksView = async () => {
     if (limitReached || isFetching) return;
 
-    if (totalCount >= 50) {
+    if (totalCount >= MAX_AMOUNT_OF_TRACKS) {
         displayFooter();
         return;
     }
 
     if (!accessToken.length) setAccessToken();
-    if (!data.length) await fetchData();
 
-    let trackList = data.slice(startPos, startPos + 10);
-    startPos += trackList.length;
-    console.log({startPos})
-    console.log({trackList});
+    let trackList = await fetchData();
     totalCount += trackList.length;
 
     for (const track of trackList) {
@@ -54,7 +50,7 @@ const renderTracksView = async () => {
                 </a>
             </div>
         `;
-        root?.appendChild(trackElement);
+        ROOT?.appendChild(trackElement);
     }
 }
 
@@ -70,7 +66,7 @@ const setAccessToken = () => {
 const submitToken = async () => {
     const tokenField = document.querySelector('input');
     accessToken = tokenField!.value;
-    const res = await fetch(fetchUrl, {
+    const res = await fetch(`${FETCH_URL}${totalCount}`, {
         headers: {
             Authorization: `Bearer ${accessToken}`
         }
@@ -85,7 +81,7 @@ const submitToken = async () => {
 
     localStorage.setItem('access_token', accessToken);
     setAccessToken();
-    root?.removeChild(document.querySelector('.main-container')!);
+    ROOT?.removeChild(document.querySelector('.main-container')!);
     await renderTracksView();
 }
 
@@ -121,7 +117,7 @@ const displayLogin = async () => {
     container.appendChild(input);
     container.appendChild(btn);
     mainContainer.appendChild(container);
-    root?.appendChild(mainContainer);
+    ROOT?.appendChild(mainContainer);
 }
 
 /**
@@ -133,7 +129,7 @@ const displayFooter = () => {
     footer.style.textAlign = 'center';
     footer.innerHTML = 'That\'s all folks!';
 
-    root?.appendChild(footer);
+    ROOT?.appendChild(footer);
     limitReached = true;
 }
 
@@ -141,7 +137,7 @@ const displayFooter = () => {
  * Pick a random musical emoji and prefix it to the website title.
  */
 const updateWebsiteTitle = () => {
-    document.title = `${emojis[Math.floor(Math.random() * emojis.length)]} Spotify Insight`;
+    document.title = `${EMOJIS[Math.floor(Math.random() * EMOJIS.length)]} Spotify Insight`;
 }
 
 /**
@@ -161,22 +157,22 @@ const toggleSpinner = () => {
             <div></div>
         `;
         spinnerElement.classList.add('spinner');
-        root?.appendChild(spinnerElement);
+        ROOT?.appendChild(spinnerElement);
         return;
     }
 
     isFetching = false;
-    root?.removeChild(spinnerElement!);
+    ROOT?.removeChild(spinnerElement!);
 }
 
 /**
- * Fetch a list of top 50 tracks for the user.
- * @returns
+ * Fetch a list of paginated tracks.
+ * @returns list of tracks
  */
 const fetchData = async () => {
     toggleSpinner();
 
-    const response = await fetch(fetchUrl, {
+    const response = await fetch(`${FETCH_URL}${totalCount}`, {
         headers: {
             Authorization: `Bearer ${accessToken}`
         }
@@ -191,9 +187,11 @@ const fetchData = async () => {
     }
 
     updateWebsiteTitle();
-    data = response.items;
+    data = [...data, response.items];
     isFetching = false;
     toggleSpinner();
+
+    return response.items;
 }
 
 /**
