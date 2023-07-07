@@ -44,7 +44,6 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 var _this = this;
-// Constants
 var ROOT = document.querySelector('#root');
 var FETCH_URL = 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=10&offset=';
 var EMOJIS = [
@@ -148,7 +147,7 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
 * Display the access token input field.
 */
 var displayLogin = function () { return __awaiter(_this, void 0, void 0, function () {
-    var rowContainer, columnContainer, container, input, btn, _a;
+    var rowContainer, columnContainer, container, input, playButton, _a;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -157,24 +156,22 @@ var displayLogin = function () { return __awaiter(_this, void 0, void 0, functio
                 rowContainer.classList.add('row-container');
                 columnContainer = document.createElement('div');
                 columnContainer.classList.add('column-container');
-                columnContainer.style.display = 'flex';
-                columnContainer.style.flexDirection = 'column';
-                columnContainer.style.justifyContent = 'center';
                 container = document.createElement('div');
                 container.classList.add('container');
                 input = document.createElement('input');
                 input.placeholder = 'Spotify Access Token';
                 input.type = 'password';
                 input.inputMode = 'password';
-                btn = document.createElement('button');
-                btn.innerHTML = '➡️';
-                _a = btn;
+                playButton = document.createElement('img');
+                playButton.classList.add('play-button');
+                playButton.src = './images/play.png';
+                _a = playButton;
                 return [4 /*yield*/, submitToken];
             case 1:
                 _a.onclick = _b.sent();
                 // container.append(obtainToken);
                 container.appendChild(input);
-                container.appendChild(btn);
+                container.appendChild(playButton);
                 rowContainer.appendChild(container);
                 columnContainer.appendChild(rowContainer);
                 ROOT === null || ROOT === void 0 ? void 0 : ROOT.appendChild(columnContainer);

@@ -1,6 +1,7 @@
 * {
     font-family: 'Roboto', sans-serif;
     font-weight: 100;
+    color: #fff;
 }
 
 #root {
@@ -18,14 +19,8 @@ h2 {
     font-size: 2em;
 }
 
-div,
-button {
-    color: #FFF;
-}
-
 input {
-    background-color: #242424;
-    color: #fff;
+    background-color: #191414;
     border-radius: 500px;
     padding: 6px 36px;
     height: 2em;
@@ -38,25 +33,16 @@ input:focus {
     outline: none;
 }
 
-button {
-    font-size: 1.5em;
-    cursor: pointer;
-    background-color: rgba(0,0,0,0);
-    border: none;
-    margin-left: 5px;
-}
-
 footer {
     font-style: italic;
 }
 
 a {
     text-decoration: none;
-    color: #fff;
 }
 
 a:hover {
-    color: #AA3392;
+    color: #b91d9c;
 }
 
 .row-container {
@@ -66,6 +52,12 @@ a:hover {
     align-items: center;
     height: 80vh;
     width: 100%;
+}
+
+.column-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .container {
@@ -94,6 +86,22 @@ footer {
     text-decoration: underline;
     font-weight: 400;
     text-align: end;
+}
+
+.play-button {
+    width: 30px;
+    margin-left: 15px;
+    cursor: pointer;
+    transition: .5s all;
+
+    background-color: #b91d9c;
+    padding: 10px;
+    border-radius: 30%;
+    border: 3px solid #191414;
+}
+
+.play-button:hover {
+    background-color: #881db9;
 }
 
 /* Spinner source: https://loading.io/css/ */

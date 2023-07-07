@@ -101,19 +101,9 @@ const displayLogin = async () => {
 
     const columnContainer = document.createElement('div');
     columnContainer.classList.add('column-container');
-    columnContainer.style.display = 'flex';
-    columnContainer.style.flexDirection = 'column';
-    columnContainer.style.justifyContent = 'center';
 
     const container = document.createElement('div');
     container.classList.add('container');
-
-    // Anchor element.
-    // const obtainToken = document.createElement('a');
-    // obtainToken.classList.add('obtain-token-link');
-    // obtainToken.href = 'https://developer.spotify.com/';
-    // obtainToken.innerHTML = 'Obtain token';
-    // obtainToken.target = '_blank';
 
     // Input element.
     const input = document.createElement('input');
@@ -121,14 +111,15 @@ const displayLogin = async () => {
     input.type = 'password';
     input.inputMode = 'password';
 
-    // Button element.
-    const btn = document.createElement('button');
-    btn.innerHTML = '➡️';
-    btn.onclick = await submitToken;
+    // Image element.
+    const playButton = document.createElement('img');
+    playButton.classList.add('play-button');
+    playButton.src = './images/play.png'
+    playButton.onclick = await submitToken;
 
     // container.append(obtainToken);
     container.appendChild(input);
-    container.appendChild(btn);
+    container.appendChild(playButton);
     rowContainer.appendChild(container);
     columnContainer.appendChild(rowContainer);
     ROOT?.appendChild(columnContainer);
