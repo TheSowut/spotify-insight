@@ -62,8 +62,8 @@ var trackPosition = 0;
 * Otherwise validate user access token and perform the API call.
 * @returns
 */
-var fetchData = function () { return __awaiter(_this, void 0, void 0, function () {
-    var response, modifiedData, _i, modifiedData_1, track, trackElement;
+var renderTracksView = function () { return __awaiter(_this, void 0, void 0, function () {
+    var trackList, _i, trackList_1, track, trackElement;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -76,30 +76,17 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
                 if (!accessToken.length)
                     setAccessToken();
                 if (!!data.length) return [3 /*break*/, 2];
-                toggleSpinner();
-                return [4 /*yield*/, fetch(fetchUrl, {
-                        headers: {
-                            Authorization: "Bearer " + accessToken
-                        }
-                    }).then(function (res) { return res.json(); })];
+                return [4 /*yield*/, fetchData()];
             case 1:
-                response = _a.sent();
-                if (response.error) {
-                    alert(response.error.message);
-                    localStorage.clear();
-                    displayLogin();
-                    return [2 /*return*/];
-                }
-                updateWebsiteTitle();
-                data = response.items;
-                isFetching = false;
-                toggleSpinner();
+                _a.sent();
                 _a.label = 2;
             case 2:
-                modifiedData = data.slice(startPos, startPos + 10);
-                totalCount += modifiedData.length;
-                for (_i = 0, modifiedData_1 = modifiedData; _i < modifiedData_1.length; _i++) {
-                    track = modifiedData_1[_i];
+                console.log({ data: data });
+                trackList = data.slice(startPos, startPos + 10);
+                totalCount += trackList.length;
+                console.log(trackList);
+                for (_i = 0, trackList_1 = trackList; _i < trackList_1.length; _i++) {
+                    track = trackList_1[_i];
                     trackElement = document.createElement('div');
                     trackElement.classList.add('track');
                     trackElement.innerHTML = "\n            <div>\n                <a href = \"" + track['uri'] + "\" target = \"_blank\">\n                    " + ++trackPosition + ". " + track['artists'][0]['name'] + " - " + track['name'] + "\n                </a>\n            </div>\n        ";
@@ -140,7 +127,7 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
                 localStorage.setItem('access_token', accessToken);
                 setAccessToken();
                 root === null || root === void 0 ? void 0 : root.removeChild(document.querySelector('.main-container'));
-                fetchData();
+                renderTracksView();
                 return [2 /*return*/];
         }
     });
@@ -175,6 +162,10 @@ var displayLogin = function () { return __awaiter(_this, void 0, void 0, functio
         return [2 /*return*/];
     });
 }); };
+/**
+ * If the user has reached the 50th record,
+ * display a footer instead of new tracks.
+ */
 var displayFooter = function () {
     var footer = document.createElement('footer');
     footer.style.textAlign = 'center';
@@ -188,6 +179,10 @@ var displayFooter = function () {
 var updateWebsiteTitle = function () {
     document.title = emojis[Math.floor(Math.random() * emojis.length)] + " Spotify Insight";
 };
+/**
+ * If an API call is being made display a spinner.
+ * @returns
+ */
 var toggleSpinner = function () {
     var spinnerElement = document.querySelector('.spinner');
     if (!spinnerElement) {
@@ -202,6 +197,37 @@ var toggleSpinner = function () {
     root === null || root === void 0 ? void 0 : root.removeChild(spinnerElement);
 };
 /**
+ * Fetch a list of top 50 tracks for the user.
+ * @returns
+ */
+var fetchData = function () { return __awaiter(_this, void 0, void 0, function () {
+    var response;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                toggleSpinner();
+                return [4 /*yield*/, fetch(fetchUrl, {
+                        headers: {
+                            Authorization: "Bearer " + accessToken
+                        }
+                    }).then(function (res) { return res.json(); })];
+            case 1:
+                response = _a.sent();
+                if (response.error) {
+                    alert(response.error.message);
+                    localStorage.clear();
+                    displayLogin();
+                    return [2 /*return*/];
+                }
+                updateWebsiteTitle();
+                data = response.items;
+                isFetching = false;
+                toggleSpinner();
+                return [2 /*return*/];
+        }
+    });
+}); };
+/**
 * Check if the user has an access token stored in the local storage.
 * If yes, perform the fetch, if not, display the "login" screen.
 */
@@ -210,7 +236,7 @@ window.addEventListener('load', function () {
         displayLogin();
         return;
     }
-    fetchData();
+    renderTracksView();
 });
 /**
 * When the users performs a mouse scroll, check his location.
@@ -221,5 +247,5 @@ window.addEventListener('scroll', function () {
         return;
     var currentPageHeight = window.innerHeight + window.scrollY;
     if (currentPageHeight >= document.body.offsetHeight)
-        fetchData();
+        renderTracksView();
 });

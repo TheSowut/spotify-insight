@@ -99,8 +99,8 @@ footer {
 .spinner div {
     position: absolute;
     top: 50%;
-    width: 20%;
-    height: 2%;
+    width: 13px;
+    height: 13px;
     border-radius: 50%;
     background: #fff;
     animation-timing-function: cubic-bezier(0, 1, 1, 0);
