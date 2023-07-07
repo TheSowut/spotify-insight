@@ -45,9 +45,9 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 };
 var _this = this;
 // Constants
-var root = document.querySelector('#root');
-var fetchUrl = 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=10&offset=';
-var emojis = [
+var ROOT = document.querySelector('#root');
+var FETCH_URL = 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=10&offset=';
+var EMOJIS = [
     '🎼',
     '🎵',
     '🎶',
@@ -58,6 +58,12 @@ var emojis = [
     '🎺',
     '🎻'
 ];
+var MAX_AMOUNT_OF_TRACKS = 50;
+var SCREEN;
+(function (SCREEN) {
+    SCREEN[SCREEN["LOGIN"] = 0] = "LOGIN";
+    SCREEN[SCREEN["SHOWCASE"] = 1] = "SHOWCASE";
+})(SCREEN || (SCREEN = {}));
 // Variables
 var totalCount = 0;
 var isFetching = false;
@@ -65,6 +71,7 @@ var accessToken = '';
 var data = [];
 var limitReached = false;
 var trackPosition = 0;
+var activeScreen;
 /**
 * If limit has been reached or a fetch request is being performed, exit.
 * Otherwise validate user access token and perform the API call.
@@ -75,9 +82,10 @@ var renderTracksView = function () { return __awaiter(_this, void 0, void 0, fun
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
+                activeScreen = SCREEN.SHOWCASE;
                 if (limitReached || isFetching)
                     return [2 /*return*/];
-                if (totalCount >= 50) {
+                if (totalCount >= MAX_AMOUNT_OF_TRACKS) {
                     displayFooter();
                     return [2 /*return*/];
                 }
@@ -92,7 +100,7 @@ var renderTracksView = function () { return __awaiter(_this, void 0, void 0, fun
                     trackElement = document.createElement('div');
                     trackElement.classList.add('track');
                     trackElement.innerHTML = "\n            <div>\n                <a href = \"" + track['uri'] + "\" target = \"_blank\">\n                    " + ++trackPosition + ". " + track['artists'][0]['name'] + " - " + track['name'] + "\n                </a>\n            </div>\n        ";
-                    root === null || root === void 0 ? void 0 : root.appendChild(trackElement);
+                    ROOT === null || ROOT === void 0 ? void 0 : ROOT.appendChild(trackElement);
                 }
                 return [2 /*return*/];
         }
@@ -113,7 +121,7 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
             case 0:
                 tokenField = document.querySelector('input');
                 accessToken = tokenField.value;
-                return [4 /*yield*/, fetch("" + fetchUrl + totalCount, {
+                return [4 /*yield*/, fetch("" + FETCH_URL + totalCount, {
                         headers: {
                             Authorization: "Bearer " + accessToken
                         }
@@ -128,7 +136,7 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
                 }
                 localStorage.setItem('access_token', accessToken);
                 setAccessToken();
-                root === null || root === void 0 ? void 0 : root.removeChild(document.querySelector('.main-container'));
+                ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(document.querySelector('.column-container'));
                 return [4 /*yield*/, renderTracksView()];
             case 2:
                 _a.sent();
@@ -140,34 +148,36 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
 * Display the access token input field.
 */
 var displayLogin = function () { return __awaiter(_this, void 0, void 0, function () {
-    var mainContainer, container, obtainToken, input, btn, _a;
+    var rowContainer, columnContainer, container, input, btn, _a;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                mainContainer = document.createElement('div');
-                mainContainer.classList.add('main-container');
+                activeScreen = SCREEN.LOGIN;
+                rowContainer = document.createElement('div');
+                rowContainer.classList.add('row-container');
+                columnContainer = document.createElement('div');
+                columnContainer.classList.add('column-container');
+                columnContainer.style.display = 'flex';
+                columnContainer.style.flexDirection = 'column';
+                columnContainer.style.justifyContent = 'center';
                 container = document.createElement('div');
                 container.classList.add('container');
-                obtainToken = document.createElement('a');
-                obtainToken.classList.add('obtain-token-link');
-                obtainToken.href = 'https://developer.spotify.com/';
-                obtainToken.innerHTML = 'Obtain token';
-                obtainToken.target = '_blank';
                 input = document.createElement('input');
                 input.placeholder = 'Spotify Access Token';
                 input.type = 'password';
                 input.inputMode = 'password';
                 btn = document.createElement('button');
-                btn.innerHTML = 'Submit';
+                btn.innerHTML = '➡️';
                 _a = btn;
                 return [4 /*yield*/, submitToken];
             case 1:
                 _a.onclick = _b.sent();
-                container.append(obtainToken);
+                // container.append(obtainToken);
                 container.appendChild(input);
                 container.appendChild(btn);
-                mainContainer.appendChild(container);
-                root === null || root === void 0 ? void 0 : root.appendChild(mainContainer);
+                rowContainer.appendChild(container);
+                columnContainer.appendChild(rowContainer);
+                ROOT === null || ROOT === void 0 ? void 0 : ROOT.appendChild(columnContainer);
                 return [2 /*return*/];
         }
     });
@@ -180,14 +190,14 @@ var displayFooter = function () {
     var footer = document.createElement('footer');
     footer.style.textAlign = 'center';
     footer.innerHTML = 'That\'s all folks!';
-    root === null || root === void 0 ? void 0 : root.appendChild(footer);
+    ROOT === null || ROOT === void 0 ? void 0 : ROOT.appendChild(footer);
     limitReached = true;
 };
 /**
  * Pick a random musical emoji and prefix it to the website title.
  */
 var updateWebsiteTitle = function () {
-    document.title = emojis[Math.floor(Math.random() * emojis.length)] + " Spotify Insight";
+    document.title = EMOJIS[Math.floor(Math.random() * EMOJIS.length)] + " Spotify Insight";
 };
 /**
  * If an API call is being made display a spinner.
@@ -200,15 +210,16 @@ var toggleSpinner = function () {
         spinnerElement = document.createElement('div');
         spinnerElement.innerHTML = "\n            <div></div>\n            <div></div>\n            <div></div>\n            <div></div>\n        ";
         spinnerElement.classList.add('spinner');
-        root === null || root === void 0 ? void 0 : root.appendChild(spinnerElement);
+        ROOT === null || ROOT === void 0 ? void 0 : ROOT.appendChild(spinnerElement);
         return;
     }
     isFetching = false;
-    root === null || root === void 0 ? void 0 : root.removeChild(spinnerElement);
+    if (spinnerElement)
+        ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(spinnerElement);
 };
 /**
- * Fetch a list of top 50 tracks for the user.
- * @returns
+ * Fetch a list of paginated tracks.
+ * @returns list of tracks
  */
 var fetchData = function () { return __awaiter(_this, void 0, void 0, function () {
     var response;
@@ -216,7 +227,7 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
         switch (_a.label) {
             case 0:
                 toggleSpinner();
-                return [4 /*yield*/, fetch("" + fetchUrl + totalCount, {
+                return [4 /*yield*/, fetch("" + FETCH_URL + totalCount, {
                         headers: {
                             Authorization: "Bearer " + accessToken
                         }
@@ -300,3 +311,18 @@ window.addEventListener('touchmove', function () { return __awaiter(_this, void 
         case 1: return [2 /*return*/, _a.sent()];
     }
 }); }); });
+window.addEventListener('keydown', function (e) { return __awaiter(_this, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                if (activeScreen !== SCREEN.LOGIN)
+                    return [2 /*return*/];
+                if (!(e.code === 'Enter')) return [3 /*break*/, 2];
+                return [4 /*yield*/, submitToken()];
+            case 1:
+                _a.sent();
+                _a.label = 2;
+            case 2: return [2 /*return*/];
+        }
+    });
+}); });

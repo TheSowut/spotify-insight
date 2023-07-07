@@ -13,6 +13,10 @@ const EMOJIS = [
     '🎻'
 ];
 const MAX_AMOUNT_OF_TRACKS: number = 50;
+enum SCREEN {
+    LOGIN,
+    SHOWCASE
+}
 
 // Variables
 let totalCount: number = 0;
@@ -21,6 +25,7 @@ let accessToken: string = '';
 let data: any[] = [];
 let limitReached: boolean = false;
 let trackPosition: number = 0;
+let activeScreen: SCREEN;
 
 /**
 * If limit has been reached or a fetch request is being performed, exit.
@@ -28,6 +33,7 @@ let trackPosition: number = 0;
 * @returns
 */
 const renderTracksView = async () => {
+    activeScreen = SCREEN.SHOWCASE;
     if (limitReached || isFetching) return;
 
     if (totalCount >= MAX_AMOUNT_OF_TRACKS) {
@@ -81,7 +87,7 @@ const submitToken = async () => {
 
     localStorage.setItem('access_token', accessToken);
     setAccessToken();
-    ROOT?.removeChild(document.querySelector('.main-container')!);
+    ROOT?.removeChild(document.querySelector('.column-container')!);
     await renderTracksView();
 }
 
@@ -89,18 +95,25 @@ const submitToken = async () => {
 * Display the access token input field.
 */
 const displayLogin = async () => {
-    const mainContainer = document.createElement('div');
-    mainContainer.classList.add('main-container');
+    activeScreen = SCREEN.LOGIN;
+    const rowContainer = document.createElement('div');
+    rowContainer.classList.add('row-container');
+
+    const columnContainer = document.createElement('div');
+    columnContainer.classList.add('column-container');
+    columnContainer.style.display = 'flex';
+    columnContainer.style.flexDirection = 'column';
+    columnContainer.style.justifyContent = 'center';
 
     const container = document.createElement('div');
     container.classList.add('container');
 
     // Anchor element.
-    const obtainToken = document.createElement('a');
-    obtainToken.classList.add('obtain-token-link');
-    obtainToken.href = 'https://developer.spotify.com/';
-    obtainToken.innerHTML = 'Obtain token';
-    obtainToken.target = '_blank';
+    // const obtainToken = document.createElement('a');
+    // obtainToken.classList.add('obtain-token-link');
+    // obtainToken.href = 'https://developer.spotify.com/';
+    // obtainToken.innerHTML = 'Obtain token';
+    // obtainToken.target = '_blank';
 
     // Input element.
     const input = document.createElement('input');
@@ -110,14 +123,15 @@ const displayLogin = async () => {
 
     // Button element.
     const btn = document.createElement('button');
-    btn.innerHTML = 'Submit';
+    btn.innerHTML = '➡️';
     btn.onclick = await submitToken;
 
-    container.append(obtainToken);
+    // container.append(obtainToken);
     container.appendChild(input);
     container.appendChild(btn);
-    mainContainer.appendChild(container);
-    ROOT?.appendChild(mainContainer);
+    rowContainer.appendChild(container);
+    columnContainer.appendChild(rowContainer);
+    ROOT?.appendChild(columnContainer);
 }
 
 /**
@@ -162,7 +176,7 @@ const toggleSpinner = () => {
     }
 
     isFetching = false;
-    ROOT?.removeChild(spinnerElement!);
+    if (spinnerElement) ROOT?.removeChild(spinnerElement);
 }
 
 /**
@@ -228,3 +242,8 @@ window.addEventListener('scroll', async () => await onScroll());
  * If the user is logged from a mobile device, listen for touchmove instead of scroll.
  */
 window.addEventListener('touchmove', async () => await onScroll());
+
+window.addEventListener('keydown', async (e) => {
+    if (activeScreen !== SCREEN.LOGIN) return;
+    if (e.code === 'Enter') await submitToken();
+});
