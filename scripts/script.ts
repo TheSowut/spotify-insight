@@ -1,5 +1,6 @@
 // Constants
-const root   = document.querySelector('#root');
+const root = document.querySelector('#root');
+const fetchUrl: string = 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50';
 const emojis = [
     '🎼',
     '🎵',
@@ -13,11 +14,11 @@ const emojis = [
 ];
 
 // Variables
-let startPos: number      = 0;
-let endPos: number        = 0;
-let isFetching: boolean   = false;
-let accessToken: string   = '';
-let data: any[]           = [];
+let startPos: number = 0;
+let totalCount: number = 0;
+let isFetching: boolean = false;
+let accessToken: string = '';
+let data: any[] = [];
 let limitReached: boolean = false;
 let trackPosition: number = 0;
 
@@ -29,18 +30,17 @@ let trackPosition: number = 0;
 const fetchData = async () => {
     if (limitReached || isFetching) return;
 
-    if (endPos >= 50) {
+    if (totalCount >= 50) {
         displayFooter();
         return;
     }
 
     if (!accessToken.length) setAccessToken();
-    if (startPos === endPos) data = [];
 
     if (!data.length) {
-        isFetching = true;
         toggleSpinner();
-        const response   = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=${endPos + 10}`, {
+
+        const response = await fetch(fetchUrl, {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
@@ -54,24 +54,18 @@ const fetchData = async () => {
         }
 
         updateWebsiteTitle();
-        data       = response.items;
-        endPos     = data.length;
+        data = response.items;
         isFetching = false;
+        toggleSpinner();
     }
 
-    let count: number = 0;
-    let trackList     = [];
+    let modifiedData = data.slice(startPos, startPos + 10);
+    totalCount += modifiedData.length;
 
-    while (count < 10) {
-        trackList.push(data[startPos++]);
-        count++;
-    }
-
-    toggleSpinner();
-    for (const track of trackList) {
+    for (const track of modifiedData) {
         const trackElement = document.createElement('div');
-              trackElement.classList.add('track');
-              trackElement.innerHTML = `
+        trackElement.classList.add('track');
+        trackElement.innerHTML = `
             <div>
                 <a href = "${track['uri']}" target = "_blank">
                     ${++trackPosition}. ${track['artists'][0]['name']} - ${track['name']}
@@ -92,9 +86,9 @@ const setAccessToken = () => {
 * @returns
 */
 const submitToken = async () => {
-   const tokenField  = document.querySelector('input');
-   accessToken       = tokenField!.value;
-   const res         = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=${endPos + 10}`, {
+    const tokenField = document.querySelector('input');
+    accessToken = tokenField!.value;
+    const res = await fetch(fetchUrl, {
         headers: {
             Authorization: `Bearer ${accessToken}`
         }
@@ -118,10 +112,10 @@ const submitToken = async () => {
 */
 const displayLogin = async () => {
     const mainContainer = document.createElement('div');
-          mainContainer.classList.add('main-container');
+    mainContainer.classList.add('main-container');
 
     const container = document.createElement('div');
-          container.classList.add('container');
+    container.classList.add('container');
 
     const obtainToken = document.createElement('a');
     obtainToken.classList.add('obtain-token-link');
@@ -129,13 +123,13 @@ const displayLogin = async () => {
     obtainToken.innerHTML = 'Obtain token';
     obtainToken.target = '_blank';
 
-    const input             = document.createElement('input');
-          input.placeholder = 'Spotify Access Token';
-          input.type = 'password';
-          input.inputMode = 'password';
-    const btn               = document.createElement('button');
-          btn.innerHTML     = 'Submit';
-          btn.onclick       = submitToken;
+    const input = document.createElement('input');
+    input.placeholder = 'Spotify Access Token';
+    input.type = 'password';
+    input.inputMode = 'password';
+    const btn = document.createElement('button');
+    btn.innerHTML = 'Submit';
+    btn.onclick = submitToken;
 
     container.append(obtainToken);
     container.appendChild(input);
@@ -163,8 +157,8 @@ const updateWebsiteTitle = () => {
 const toggleSpinner = () => {
     let spinnerElement = document.querySelector('.spinner');
 
-    console.log(spinnerElement);
     if (!spinnerElement) {
+        isFetching = true;
         spinnerElement = document.createElement('div');
         spinnerElement.innerHTML = `
             <div></div>
@@ -177,6 +171,7 @@ const toggleSpinner = () => {
         return;
     }
 
+    isFetching = false;
     root?.removeChild(spinnerElement!);
 }
 

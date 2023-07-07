@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var _this = this;
 // Constants
 var root = document.querySelector('#root');
+var fetchUrl = 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50';
 var emojis = [
     '🎼',
     '🎵',
@@ -50,7 +51,7 @@ var emojis = [
 ];
 // Variables
 var startPos = 0;
-var endPos = 0;
+var totalCount = 0;
 var isFetching = false;
 var accessToken = '';
 var data = [];
@@ -62,24 +63,21 @@ var trackPosition = 0;
 * @returns
 */
 var fetchData = function () { return __awaiter(_this, void 0, void 0, function () {
-    var response, count, trackList, _i, trackList_1, track, trackElement;
+    var response, modifiedData, _i, modifiedData_1, track, trackElement;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 if (limitReached || isFetching)
                     return [2 /*return*/];
-                if (endPos >= 50) {
+                if (totalCount >= 50) {
                     displayFooter();
                     return [2 /*return*/];
                 }
                 if (!accessToken.length)
                     setAccessToken();
-                if (startPos === endPos)
-                    data = [];
                 if (!!data.length) return [3 /*break*/, 2];
-                isFetching = true;
                 toggleSpinner();
-                return [4 /*yield*/, fetch("https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=" + (endPos + 10), {
+                return [4 /*yield*/, fetch(fetchUrl, {
                         headers: {
                             Authorization: "Bearer " + accessToken
                         }
@@ -94,19 +92,14 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
                 }
                 updateWebsiteTitle();
                 data = response.items;
-                endPos = data.length;
                 isFetching = false;
+                toggleSpinner();
                 _a.label = 2;
             case 2:
-                count = 0;
-                trackList = [];
-                while (count < 10) {
-                    trackList.push(data[startPos++]);
-                    count++;
-                }
-                toggleSpinner();
-                for (_i = 0, trackList_1 = trackList; _i < trackList_1.length; _i++) {
-                    track = trackList_1[_i];
+                modifiedData = data.slice(startPos, startPos + 10);
+                totalCount += modifiedData.length;
+                for (_i = 0, modifiedData_1 = modifiedData; _i < modifiedData_1.length; _i++) {
+                    track = modifiedData_1[_i];
                     trackElement = document.createElement('div');
                     trackElement.classList.add('track');
                     trackElement.innerHTML = "\n            <div>\n                <a href = \"" + track['uri'] + "\" target = \"_blank\">\n                    " + ++trackPosition + ". " + track['artists'][0]['name'] + " - " + track['name'] + "\n                </a>\n            </div>\n        ";
@@ -131,7 +124,7 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
             case 0:
                 tokenField = document.querySelector('input');
                 accessToken = tokenField.value;
-                return [4 /*yield*/, fetch("https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=" + (endPos + 10), {
+                return [4 /*yield*/, fetch(fetchUrl, {
                         headers: {
                             Authorization: "Bearer " + accessToken
                         }
@@ -197,14 +190,15 @@ var updateWebsiteTitle = function () {
 };
 var toggleSpinner = function () {
     var spinnerElement = document.querySelector('.spinner');
-    console.log(spinnerElement);
     if (!spinnerElement) {
+        isFetching = true;
         spinnerElement = document.createElement('div');
         spinnerElement.innerHTML = "\n            <div></div>\n            <div></div>\n            <div></div>\n            <div></div>\n        ";
         spinnerElement.classList.add('spinner');
         root === null || root === void 0 ? void 0 : root.appendChild(spinnerElement);
         return;
     }
+    isFetching = false;
     root === null || root === void 0 ? void 0 : root.removeChild(spinnerElement);
 };
 /**
