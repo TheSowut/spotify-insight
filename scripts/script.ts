@@ -39,6 +39,9 @@ const renderTracksView = async () => {
     if (!data.length) await fetchData();
 
     let trackList = data.slice(startPos, startPos + 10);
+    startPos += trackList.length;
+    console.log({startPos})
+    console.log({trackList});
     totalCount += trackList.length;
 
     for (const track of trackList) {

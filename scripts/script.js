@@ -82,6 +82,9 @@ var renderTracksView = function () { return __awaiter(_this, void 0, void 0, fun
                 _a.label = 2;
             case 2:
                 trackList = data.slice(startPos, startPos + 10);
+                startPos += trackList.length;
+                console.log({ startPos: startPos });
+                console.log({ trackList: trackList });
                 totalCount += trackList.length;
                 for (_i = 0, trackList_1 = trackList; _i < trackList_1.length; _i++) {
                     track = trackList_1[_i];
@@ -125,7 +128,9 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
                 localStorage.setItem('access_token', accessToken);
                 setAccessToken();
                 root === null || root === void 0 ? void 0 : root.removeChild(document.querySelector('.main-container'));
-                renderTracksView();
+                return [4 /*yield*/, renderTracksView()];
+            case 2:
+                _a.sent();
                 return [2 /*return*/];
         }
     });
@@ -134,30 +139,36 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
 * Display the access token input field.
 */
 var displayLogin = function () { return __awaiter(_this, void 0, void 0, function () {
-    var mainContainer, container, obtainToken, input, btn;
-    return __generator(this, function (_a) {
-        mainContainer = document.createElement('div');
-        mainContainer.classList.add('main-container');
-        container = document.createElement('div');
-        container.classList.add('container');
-        obtainToken = document.createElement('a');
-        obtainToken.classList.add('obtain-token-link');
-        obtainToken.href = 'https://developer.spotify.com/';
-        obtainToken.innerHTML = 'Obtain token';
-        obtainToken.target = '_blank';
-        input = document.createElement('input');
-        input.placeholder = 'Spotify Access Token';
-        input.type = 'password';
-        input.inputMode = 'password';
-        btn = document.createElement('button');
-        btn.innerHTML = 'Submit';
-        btn.onclick = submitToken;
-        container.append(obtainToken);
-        container.appendChild(input);
-        container.appendChild(btn);
-        mainContainer.appendChild(container);
-        root === null || root === void 0 ? void 0 : root.appendChild(mainContainer);
-        return [2 /*return*/];
+    var mainContainer, container, obtainToken, input, btn, _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                mainContainer = document.createElement('div');
+                mainContainer.classList.add('main-container');
+                container = document.createElement('div');
+                container.classList.add('container');
+                obtainToken = document.createElement('a');
+                obtainToken.classList.add('obtain-token-link');
+                obtainToken.href = 'https://developer.spotify.com/';
+                obtainToken.innerHTML = 'Obtain token';
+                obtainToken.target = '_blank';
+                input = document.createElement('input');
+                input.placeholder = 'Spotify Access Token';
+                input.type = 'password';
+                input.inputMode = 'password';
+                btn = document.createElement('button');
+                btn.innerHTML = 'Submit';
+                _a = btn;
+                return [4 /*yield*/, submitToken];
+            case 1:
+                _a.onclick = _b.sent();
+                container.append(obtainToken);
+                container.appendChild(input);
+                container.appendChild(btn);
+                mainContainer.appendChild(container);
+                root === null || root === void 0 ? void 0 : root.appendChild(mainContainer);
+                return [2 /*return*/];
+        }
     });
 }); };
 /**
@@ -211,13 +222,15 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
                     }).then(function (res) { return res.json(); })];
             case 1:
                 response = _a.sent();
-                if (response.error) {
-                    alert(response.error.message);
-                    localStorage.clear();
-                    toggleSpinner();
-                    displayLogin();
-                    return [2 /*return*/];
-                }
+                if (!response.error) return [3 /*break*/, 3];
+                alert(response.error.message);
+                localStorage.clear();
+                toggleSpinner();
+                return [4 /*yield*/, displayLogin()];
+            case 2:
+                _a.sent();
+                return [2 /*return*/];
+            case 3:
                 updateWebsiteTitle();
                 data = response.items;
                 isFetching = false;
@@ -231,29 +244,58 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
  * fetch the records and render them in the view.
  * @returns
  */
-var onScroll = function () {
-    if (isFetching)
-        return;
-    var currentPageHeight = window.innerHeight + window.scrollY;
-    if (currentPageHeight >= document.body.offsetHeight)
-        renderTracksView();
-};
+var onScroll = function () { return __awaiter(_this, void 0, void 0, function () {
+    var currentPageHeight;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                if (isFetching)
+                    return [2 /*return*/];
+                currentPageHeight = window.innerHeight + window.scrollY;
+                if (!(currentPageHeight >= document.body.offsetHeight)) return [3 /*break*/, 2];
+                return [4 /*yield*/, renderTracksView()];
+            case 1:
+                _a.sent();
+                _a.label = 2;
+            case 2: return [2 /*return*/];
+        }
+    });
+}); };
 /**
 * Check if the user has an access token stored in the local storage.
 * If yes, perform the fetch, if not, display the "login" screen.
 */
-window.addEventListener('load', function () {
-    if (!localStorage.getItem('access_token')) {
-        displayLogin();
-        return;
-    }
-    renderTracksView();
-});
+window.addEventListener('load', function () { return __awaiter(_this, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                if (!!localStorage.getItem('access_token')) return [3 /*break*/, 2];
+                return [4 /*yield*/, displayLogin()];
+            case 1:
+                _a.sent();
+                return [2 /*return*/];
+            case 2: return [4 /*yield*/, renderTracksView()];
+            case 3:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); });
 /**
 * When the users performs a mouse scroll, check his location.
 */
-window.addEventListener('scroll', function () { return onScroll(); });
+window.addEventListener('scroll', function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+    switch (_a.label) {
+        case 0: return [4 /*yield*/, onScroll()];
+        case 1: return [2 /*return*/, _a.sent()];
+    }
+}); }); });
 /**
  * If the user is logged from a mobile device, listen for touchmove instead of scroll.
  */
-window.addEventListener('touchmove', function () { return onScroll(); });
+window.addEventListener('touchmove', function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+    switch (_a.label) {
+        case 0: return [4 /*yield*/, onScroll()];
+        case 1: return [2 /*return*/, _a.sent()];
+    }
+}); }); });
