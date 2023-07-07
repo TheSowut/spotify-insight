@@ -194,6 +194,18 @@ const fetchData = async () => {
 }
 
 /**
+ * If the user has reached the end of the page and has tracks left,
+ * fetch the records and render them in the view.
+ * @returns
+ */
+const onScroll = () => {
+    if (isFetching) return;
+
+    const currentPageHeight: number = window.innerHeight + window.scrollY;
+    if (currentPageHeight >= document.body.offsetHeight) renderTracksView();
+}
+
+/**
 * Check if the user has an access token stored in the local storage.
 * If yes, perform the fetch, if not, display the "login" screen.
 */
@@ -208,11 +220,10 @@ window.addEventListener('load', () => {
 
 /**
 * When the users performs a mouse scroll, check his location.
-* If he has reached the end of the page and has tracks left, fetch the data.
 */
-window.addEventListener('scroll', () => {
-    if (isFetching) return;
+window.addEventListener('scroll', () => onScroll());
 
-    const currentPageHeight: number = window.innerHeight + window.scrollY;
-    if (currentPageHeight >= document.body.offsetHeight) renderTracksView();
-});
+/**
+ * If the user is logged from a mobile device, listen for touchmove instead of scroll.
+ */
+window.addEventListener('touchmove', () => onScroll());

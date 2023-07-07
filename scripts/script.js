@@ -227,6 +227,18 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
     });
 }); };
 /**
+ * If the user has reached the end of the page and has tracks left,
+ * fetch the records and render them in the view.
+ * @returns
+ */
+var onScroll = function () {
+    if (isFetching)
+        return;
+    var currentPageHeight = window.innerHeight + window.scrollY;
+    if (currentPageHeight >= document.body.offsetHeight)
+        renderTracksView();
+};
+/**
 * Check if the user has an access token stored in the local storage.
 * If yes, perform the fetch, if not, display the "login" screen.
 */
@@ -239,12 +251,9 @@ window.addEventListener('load', function () {
 });
 /**
 * When the users performs a mouse scroll, check his location.
-* If he has reached the end of the page and has tracks left, fetch the data.
 */
-window.addEventListener('scroll', function () {
-    if (isFetching)
-        return;
-    var currentPageHeight = window.innerHeight + window.scrollY;
-    if (currentPageHeight >= document.body.offsetHeight)
-        renderTracksView();
-});
+window.addEventListener('scroll', function () { return onScroll(); });
+/**
+ * If the user is logged from a mobile device, listen for touchmove instead of scroll.
+ */
+window.addEventListener('touchmove', function () { return onScroll(); });
