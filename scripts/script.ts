@@ -227,12 +227,18 @@ window.addEventListener('load', async () => {
 /**
 * When the users performs a mouse scroll, check his location.
 */
-window.addEventListener('scroll', async () => await onScroll());
+window.addEventListener('scroll', async () => {
+    if (activeScreen !== SCREEN.SHOWCASE) return;
+    await onScroll();
+});
 
 /**
  * If the user is logged from a mobile device, listen for touchmove instead of scroll.
  */
-window.addEventListener('touchmove', async () => await onScroll());
+window.addEventListener('touchmove', async () => {
+    if (activeScreen !== SCREEN.SHOWCASE) return;
+    await onScroll();
+});
 
 window.addEventListener('keydown', async (e) => {
     if (activeScreen !== SCREEN.LOGIN) return;

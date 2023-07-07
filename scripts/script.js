@@ -44,6 +44,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 var _this = this;
+// Constants
 var ROOT = document.querySelector('#root');
 var FETCH_URL = 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=10&offset=';
 var EMOJIS = [
@@ -293,21 +294,35 @@ window.addEventListener('load', function () { return __awaiter(_this, void 0, vo
 /**
 * When the users performs a mouse scroll, check his location.
 */
-window.addEventListener('scroll', function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
-    switch (_a.label) {
-        case 0: return [4 /*yield*/, onScroll()];
-        case 1: return [2 /*return*/, _a.sent()];
-    }
-}); }); });
+window.addEventListener('scroll', function () { return __awaiter(_this, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                if (activeScreen !== SCREEN.SHOWCASE)
+                    return [2 /*return*/];
+                return [4 /*yield*/, onScroll()];
+            case 1:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); });
 /**
  * If the user is logged from a mobile device, listen for touchmove instead of scroll.
  */
-window.addEventListener('touchmove', function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
-    switch (_a.label) {
-        case 0: return [4 /*yield*/, onScroll()];
-        case 1: return [2 /*return*/, _a.sent()];
-    }
-}); }); });
+window.addEventListener('touchmove', function () { return __awaiter(_this, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                if (activeScreen !== SCREEN.SHOWCASE)
+                    return [2 /*return*/];
+                return [4 /*yield*/, onScroll()];
+            case 1:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); });
 window.addEventListener('keydown', function (e) { return __awaiter(_this, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
