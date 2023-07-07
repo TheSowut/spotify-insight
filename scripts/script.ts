@@ -30,12 +30,7 @@ const fetchData = async () => {
     if (limitReached || isFetching) return;
 
     if (endPos >= 50) {
-        let footer: HTMLElement    = document.createElement('footer');
-            footer.style.textAlign = 'center';
-            footer.innerHTML       = 'That\'s all folks!';
-
-        root?.appendChild(footer);
-        limitReached = true;
+        displayFooter();
         return;
     }
 
@@ -44,6 +39,7 @@ const fetchData = async () => {
 
     if (!data.length) {
         isFetching = true;
+        toggleSpinner();
         const response   = await fetch(`https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=${endPos + 10}`, {
             headers: {
                 Authorization: `Bearer ${accessToken}`
@@ -71,8 +67,9 @@ const fetchData = async () => {
         count++;
     }
 
+    toggleSpinner();
     for (const track of trackList) {
-        const trackElement           = document.createElement('div');
+        const trackElement = document.createElement('div');
               trackElement.classList.add('track');
               trackElement.innerHTML = `
             <div>
@@ -147,11 +144,40 @@ const displayLogin = async () => {
     root?.appendChild(mainContainer);
 }
 
+const displayFooter = () => {
+    let footer: HTMLElement = document.createElement('footer');
+    footer.style.textAlign = 'center';
+    footer.innerHTML = 'That\'s all folks!';
+
+    root?.appendChild(footer);
+    limitReached = true;
+}
+
 /**
  * Pick a random musical emoji and prefix it to the website title.
  */
 const updateWebsiteTitle = () => {
     document.title = `${emojis[Math.floor(Math.random() * emojis.length)]} Spotify Insight`;
+}
+
+const toggleSpinner = () => {
+    let spinnerElement = document.querySelector('.spinner');
+
+    console.log(spinnerElement);
+    if (!spinnerElement) {
+        spinnerElement = document.createElement('div');
+        spinnerElement.innerHTML = `
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        `;
+        spinnerElement.classList.add('spinner');
+        root?.appendChild(spinnerElement);
+        return;
+    }
+
+    root?.removeChild(spinnerElement!);
 }
 
 /**

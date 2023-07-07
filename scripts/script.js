@@ -62,18 +62,14 @@ var trackPosition = 0;
 * @returns
 */
 var fetchData = function () { return __awaiter(_this, void 0, void 0, function () {
-    var footer, response, count, trackList, _i, trackList_1, track, trackElement;
+    var response, count, trackList, _i, trackList_1, track, trackElement;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 if (limitReached || isFetching)
                     return [2 /*return*/];
                 if (endPos >= 50) {
-                    footer = document.createElement('footer');
-                    footer.style.textAlign = 'center';
-                    footer.innerHTML = 'That\'s all folks!';
-                    root === null || root === void 0 ? void 0 : root.appendChild(footer);
-                    limitReached = true;
+                    displayFooter();
                     return [2 /*return*/];
                 }
                 if (!accessToken.length)
@@ -82,6 +78,7 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
                     data = [];
                 if (!!data.length) return [3 /*break*/, 2];
                 isFetching = true;
+                toggleSpinner();
                 return [4 /*yield*/, fetch("https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=" + (endPos + 10), {
                         headers: {
                             Authorization: "Bearer " + accessToken
@@ -107,6 +104,7 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
                     trackList.push(data[startPos++]);
                     count++;
                 }
+                toggleSpinner();
                 for (_i = 0, trackList_1 = trackList; _i < trackList_1.length; _i++) {
                     track = trackList_1[_i];
                     trackElement = document.createElement('div');
@@ -184,11 +182,30 @@ var displayLogin = function () { return __awaiter(_this, void 0, void 0, functio
         return [2 /*return*/];
     });
 }); };
+var displayFooter = function () {
+    var footer = document.createElement('footer');
+    footer.style.textAlign = 'center';
+    footer.innerHTML = 'That\'s all folks!';
+    root === null || root === void 0 ? void 0 : root.appendChild(footer);
+    limitReached = true;
+};
 /**
  * Pick a random musical emoji and prefix it to the website title.
  */
 var updateWebsiteTitle = function () {
     document.title = emojis[Math.floor(Math.random() * emojis.length)] + " Spotify Insight";
+};
+var toggleSpinner = function () {
+    var spinnerElement = document.querySelector('.spinner');
+    console.log(spinnerElement);
+    if (!spinnerElement) {
+        spinnerElement = document.createElement('div');
+        spinnerElement.innerHTML = "\n            <div></div>\n            <div></div>\n            <div></div>\n            <div></div>\n        ";
+        spinnerElement.classList.add('spinner');
+        root === null || root === void 0 ? void 0 : root.appendChild(spinnerElement);
+        return;
+    }
+    root === null || root === void 0 ? void 0 : root.removeChild(spinnerElement);
 };
 /**
 * Check if the user has an access token stored in the local storage.
