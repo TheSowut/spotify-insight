@@ -83,7 +83,7 @@ const submitToken = async () => {
     localStorage.setItem('access_token', accessToken);
     setAccessToken();
     root?.removeChild(document.querySelector('.main-container')!);
-    renderTracksView();
+    await renderTracksView();
 }
 
 /**
@@ -112,7 +112,7 @@ const displayLogin = async () => {
     // Button element.
     const btn = document.createElement('button');
     btn.innerHTML = 'Submit';
-    btn.onclick = submitToken;
+    btn.onclick = await submitToken;
 
     container.append(obtainToken);
     container.appendChild(input);
@@ -183,7 +183,7 @@ const fetchData = async () => {
         alert(response.error.message);
         localStorage.clear();
         toggleSpinner();
-        displayLogin();
+        await displayLogin();
         return;
     }
 
@@ -198,32 +198,32 @@ const fetchData = async () => {
  * fetch the records and render them in the view.
  * @returns
  */
-const onScroll = () => {
+const onScroll = async () => {
     if (isFetching) return;
 
     const currentPageHeight: number = window.innerHeight + window.scrollY;
-    if (currentPageHeight >= document.body.offsetHeight) renderTracksView();
+    if (currentPageHeight >= document.body.offsetHeight) await renderTracksView();
 }
 
 /**
 * Check if the user has an access token stored in the local storage.
 * If yes, perform the fetch, if not, display the "login" screen.
 */
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
     if (!localStorage.getItem('access_token')) {
-        displayLogin();
+        await displayLogin();
         return;
     }
 
-    renderTracksView();
+    await renderTracksView();
 });
 
 /**
 * When the users performs a mouse scroll, check his location.
 */
-window.addEventListener('scroll', () => onScroll());
+window.addEventListener('scroll', async () => await onScroll());
 
 /**
  * If the user is logged from a mobile device, listen for touchmove instead of scroll.
  */
-window.addEventListener('touchmove', () => onScroll());
+window.addEventListener('touchmove', async () => await onScroll());
