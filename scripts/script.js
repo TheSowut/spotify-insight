@@ -81,10 +81,8 @@ var renderTracksView = function () { return __awaiter(_this, void 0, void 0, fun
                 _a.sent();
                 _a.label = 2;
             case 2:
-                console.log({ data: data });
                 trackList = data.slice(startPos, startPos + 10);
                 totalCount += trackList.length;
-                console.log(trackList);
                 for (_i = 0, trackList_1 = trackList; _i < trackList_1.length; _i++) {
                     track = trackList_1[_i];
                     trackElement = document.createElement('div');
@@ -216,6 +214,7 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
                 if (response.error) {
                     alert(response.error.message);
                     localStorage.clear();
+                    toggleSpinner();
                     displayLogin();
                     return [2 /*return*/];
                 }

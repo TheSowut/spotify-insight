@@ -182,6 +182,7 @@ const fetchData = async () => {
     if (response.error) {
         alert(response.error.message);
         localStorage.clear();
+        toggleSpinner();
         displayLogin();
         return;
     }
