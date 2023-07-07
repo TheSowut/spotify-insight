@@ -27,7 +27,7 @@ let trackPosition: number = 0;
 * Otherwise validate user access token and perform the API call.
 * @returns
 */
-const fetchData = async () => {
+const renderTracksView = async () => {
     if (limitReached || isFetching) return;
 
     if (totalCount >= 50) {
@@ -36,33 +36,12 @@ const fetchData = async () => {
     }
 
     if (!accessToken.length) setAccessToken();
+    if (!data.length) fetchData();
 
-    if (!data.length) {
-        toggleSpinner();
+    let trackList = data.slice(startPos, startPos + 10);
+    totalCount += trackList.length;
 
-        const response = await fetch(fetchUrl, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            }
-        }).then(res => res.json());
-
-        if (response.error) {
-            alert(response.error.message);
-            localStorage.clear();
-            displayLogin();
-            return;
-        }
-
-        updateWebsiteTitle();
-        data = response.items;
-        isFetching = false;
-        toggleSpinner();
-    }
-
-    let modifiedData = data.slice(startPos, startPos + 10);
-    totalCount += modifiedData.length;
-
-    for (const track of modifiedData) {
+    for (const track of trackList) {
         const trackElement = document.createElement('div');
         trackElement.classList.add('track');
         trackElement.innerHTML = `
@@ -104,7 +83,7 @@ const submitToken = async () => {
     localStorage.setItem('access_token', accessToken);
     setAccessToken();
     root?.removeChild(document.querySelector('.main-container')!);
-    fetchData();
+    renderTracksView();
 }
 
 /**
@@ -117,16 +96,20 @@ const displayLogin = async () => {
     const container = document.createElement('div');
     container.classList.add('container');
 
+    // Anchor element.
     const obtainToken = document.createElement('a');
     obtainToken.classList.add('obtain-token-link');
     obtainToken.href = 'https://developer.spotify.com/';
     obtainToken.innerHTML = 'Obtain token';
     obtainToken.target = '_blank';
 
+    // Input element.
     const input = document.createElement('input');
     input.placeholder = 'Spotify Access Token';
     input.type = 'password';
     input.inputMode = 'password';
+
+    // Button element.
     const btn = document.createElement('button');
     btn.innerHTML = 'Submit';
     btn.onclick = submitToken;
@@ -138,6 +121,10 @@ const displayLogin = async () => {
     root?.appendChild(mainContainer);
 }
 
+/**
+ * If the user has reached the 50th record,
+ * display a footer instead of new tracks.
+ */
 const displayFooter = () => {
     let footer: HTMLElement = document.createElement('footer');
     footer.style.textAlign = 'center';
@@ -154,6 +141,10 @@ const updateWebsiteTitle = () => {
     document.title = `${emojis[Math.floor(Math.random() * emojis.length)]} Spotify Insight`;
 }
 
+/**
+ * If an API call is being made display a spinner.
+ * @returns
+ */
 const toggleSpinner = () => {
     let spinnerElement = document.querySelector('.spinner');
 
@@ -176,6 +167,32 @@ const toggleSpinner = () => {
 }
 
 /**
+ * Fetch a list of top 50 tracks for the user.
+ * @returns
+ */
+const fetchData = async () => {
+    toggleSpinner();
+
+    const response = await fetch(fetchUrl, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        }
+    }).then(res => res.json());
+
+    if (response.error) {
+        alert(response.error.message);
+        localStorage.clear();
+        displayLogin();
+        return;
+    }
+
+    updateWebsiteTitle();
+    data = response.items;
+    isFetching = false;
+    toggleSpinner();
+}
+
+/**
 * Check if the user has an access token stored in the local storage.
 * If yes, perform the fetch, if not, display the "login" screen.
 */
@@ -185,7 +202,7 @@ window.addEventListener('load', () => {
         return;
     }
 
-    fetchData();
+    renderTracksView();
 });
 
 /**
@@ -196,5 +213,5 @@ window.addEventListener('scroll', () => {
     if (isFetching) return;
 
     const currentPageHeight: number = window.innerHeight + window.scrollY;
-    if (currentPageHeight >= document.body.offsetHeight) fetchData();
+    if (currentPageHeight >= document.body.offsetHeight) renderTracksView();
 });
