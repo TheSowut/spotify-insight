@@ -294,12 +294,44 @@ window.addEventListener('load', function () { return __awaiter(_this, void 0, vo
         }
     });
 }); });
-var renderLogoutButton = function () {
-    var logoutBtn = document.createElement('button');
-    logoutBtn.classList.add('logout-button');
-    logoutBtn.innerHTML = "\u274C";
-    ROOT === null || ROOT === void 0 ? void 0 : ROOT.appendChild(logoutBtn);
-};
+var renderLogoutButton = function () { return __awaiter(_this, void 0, void 0, function () {
+    var logoutBtn, _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                logoutBtn = document.createElement('button');
+                logoutBtn.classList.add('logout-button');
+                _a = logoutBtn;
+                return [4 /*yield*/, logout];
+            case 1:
+                _a.onclick = _b.sent();
+                logoutBtn.innerHTML = "\u274C";
+                ROOT === null || ROOT === void 0 ? void 0 : ROOT.appendChild(logoutBtn);
+                return [2 /*return*/];
+        }
+    });
+}); };
+var logout = function () { return __awaiter(_this, void 0, void 0, function () {
+    var tracks, logoutBtn, _i, _a, track;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                tracks = document.querySelectorAll('.track');
+                logoutBtn = document.querySelector('.logout-button');
+                for (_i = 0, _a = Array.from(tracks); _i < _a.length; _i++) {
+                    track = _a[_i];
+                    ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(track);
+                }
+                if (logoutBtn)
+                    ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(logoutBtn);
+                localStorage.clear();
+                return [4 /*yield*/, displayLogin()];
+            case 1:
+                _b.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
 /**
 * When the users performs a mouse scroll, check his location.
 */

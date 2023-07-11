@@ -116,6 +116,10 @@ footer {
     border: none;
 }
 
+.logout-button:hover {
+    background-color: #0c0a0a;
+}
+
 /* Spinner source: https://loading.io/css/ */
 .spinner {
     display: inline-block;

@@ -225,11 +225,23 @@ window.addEventListener('load', async () => {
     await renderLogoutButton();
 });
 
-const renderLogoutButton = () => {
+const renderLogoutButton = async () => {
     const logoutBtn = document.createElement('button');
     logoutBtn.classList.add('logout-button');
+    logoutBtn.onclick = await logout;
     logoutBtn.innerHTML = `❌`;
     ROOT?.appendChild(logoutBtn);
+}
+
+const logout = async () => {
+    let tracks = document.querySelectorAll('.track');
+    let logoutBtn = document.querySelector('.logout-button');
+    for (const track of Array.from(tracks)) {
+        ROOT?.removeChild(track)
+    }
+    if (logoutBtn) ROOT?.removeChild(logoutBtn);
+    localStorage.clear();
+    await displayLogin();
 }
 
 /**
