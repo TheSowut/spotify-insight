@@ -104,6 +104,18 @@ footer {
     background-color: #881db9;
 }
 
+.logout-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-radius: 0px 0px 0px 15px;
+    cursor: pointer;
+    line-height: 1.25em;
+    font-size: 2em;
+    background-color: #191414;
+    border: none;
+}
+
 /* Spinner source: https://loading.io/css/ */
 .spinner {
     display: inline-block;
