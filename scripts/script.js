@@ -140,6 +140,9 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
                 return [4 /*yield*/, renderTracksView()];
             case 2:
                 _a.sent();
+                return [4 /*yield*/, renderLogoutButton()];
+            case 3:
+                _a.sent();
                 return [2 /*return*/];
         }
     });
@@ -312,18 +315,21 @@ var renderLogoutButton = function () { return __awaiter(_this, void 0, void 0, f
     });
 }); };
 var logout = function () { return __awaiter(_this, void 0, void 0, function () {
-    var tracks, logoutBtn, _i, _a, track;
+    var tracks, logoutBtn, footer, _i, _a, track;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 tracks = document.querySelectorAll('.track');
                 logoutBtn = document.querySelector('.logout-button');
+                footer = document.querySelector('footer');
                 for (_i = 0, _a = Array.from(tracks); _i < _a.length; _i++) {
                     track = _a[_i];
                     ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(track);
                 }
                 if (logoutBtn)
                     ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(logoutBtn);
+                if (footer)
+                    ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(footer);
                 localStorage.clear();
                 return [4 /*yield*/, displayLogin()];
             case 1:

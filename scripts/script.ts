@@ -89,6 +89,7 @@ const submitToken = async () => {
     setAccessToken();
     ROOT?.removeChild(document.querySelector('.column-container')!);
     await renderTracksView();
+    await renderLogoutButton();
 }
 
 /**
@@ -234,12 +235,14 @@ const renderLogoutButton = async () => {
 }
 
 const logout = async () => {
-    let tracks = document.querySelectorAll('.track');
-    let logoutBtn = document.querySelector('.logout-button');
+    const tracks = document.querySelectorAll('.track');
+    const logoutBtn = document.querySelector('.logout-button');
+    const footer = document.querySelector('footer');
     for (const track of Array.from(tracks)) {
         ROOT?.removeChild(track)
     }
     if (logoutBtn) ROOT?.removeChild(logoutBtn);
+    if (footer) ROOT?.removeChild(footer);
     localStorage.clear();
     await displayLogin();
 }
