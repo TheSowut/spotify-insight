@@ -287,10 +287,26 @@ window.addEventListener('load', function () { return __awaiter(_this, void 0, vo
             case 2: return [4 /*yield*/, renderTracksView()];
             case 3:
                 _a.sent();
+                return [4 /*yield*/, test()];
+            case 4:
+                _a.sent();
                 return [2 /*return*/];
         }
     });
 }); });
+var test = function () {
+    var newEl = document.createElement('buton');
+    newEl.style.position = 'absolute';
+    newEl.style.top = '0';
+    newEl.style.right = '0';
+    newEl.style.borderRadius = '0px 0px 0px 15px';
+    newEl.style.cursor = 'pointer';
+    newEl.innerHTML = "\u274C";
+    newEl.style.lineHeight = '1.25em';
+    newEl.style.fontSize = '2em';
+    newEl.style.backgroundColor = '#191414';
+    ROOT === null || ROOT === void 0 ? void 0 : ROOT.appendChild(newEl);
+};
 /**
 * When the users performs a mouse scroll, check his location.
 */

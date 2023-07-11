@@ -222,7 +222,22 @@ window.addEventListener('load', async () => {
     }
 
     await renderTracksView();
+    await test();
 });
+
+const test = () => {
+    const newEl = document.createElement('buton');
+    newEl.style.position = 'absolute';
+    newEl.style.top = '0';
+    newEl.style.right = '0';
+    newEl.style.borderRadius = '0px 0px 0px 15px';
+    newEl.style.cursor = 'pointer';
+    newEl.innerHTML = `❌`;
+    newEl.style.lineHeight = '1.25em';
+    newEl.style.fontSize = '2em';
+    newEl.style.backgroundColor = '#191414';
+    ROOT?.appendChild(newEl);
+}
 
 /**
 * When the users performs a mouse scroll, check his location.
