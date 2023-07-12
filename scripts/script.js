@@ -140,6 +140,9 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
                 return [4 /*yield*/, renderTracksView()];
             case 2:
                 _a.sent();
+                return [4 /*yield*/, renderLogoutButton()];
+            case 3:
+                _a.sent();
                 return [2 /*return*/];
         }
     });
@@ -188,6 +191,7 @@ var displayFooter = function () {
     var footer = document.createElement('footer');
     footer.style.textAlign = 'center';
     footer.innerHTML = 'That\'s all folks!';
+    footer.onclick = returnToTop;
     ROOT === null || ROOT === void 0 ? void 0 : ROOT.appendChild(footer);
     limitReached = true;
 };
@@ -287,10 +291,58 @@ window.addEventListener('load', function () { return __awaiter(_this, void 0, vo
             case 2: return [4 /*yield*/, renderTracksView()];
             case 3:
                 _a.sent();
+                return [4 /*yield*/, renderLogoutButton()];
+            case 4:
+                _a.sent();
                 return [2 /*return*/];
         }
     });
 }); });
+var renderLogoutButton = function () { return __awaiter(_this, void 0, void 0, function () {
+    var logoutBtn, _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                logoutBtn = document.createElement('button');
+                logoutBtn.classList.add('logout-button');
+                _a = logoutBtn;
+                return [4 /*yield*/, logout];
+            case 1:
+                _a.onclick = _b.sent();
+                logoutBtn.innerHTML = "\u274C";
+                ROOT === null || ROOT === void 0 ? void 0 : ROOT.appendChild(logoutBtn);
+                return [2 /*return*/];
+        }
+    });
+}); };
+var logout = function () { return __awaiter(_this, void 0, void 0, function () {
+    var tracks, logoutBtn, footer, _i, _a, track;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                tracks = document.querySelectorAll('.track');
+                logoutBtn = document.querySelector('.logout-button');
+                footer = document.querySelector('footer');
+                for (_i = 0, _a = Array.from(tracks); _i < _a.length; _i++) {
+                    track = _a[_i];
+                    ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(track);
+                }
+                if (logoutBtn)
+                    ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(logoutBtn);
+                if (footer)
+                    ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(footer);
+                localStorage.clear();
+                return [4 /*yield*/, displayLogin()];
+            case 1:
+                _b.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
+var returnToTop = function () {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+};
 /**
 * When the users performs a mouse scroll, check his location.
 */

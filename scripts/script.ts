@@ -89,6 +89,7 @@ const submitToken = async () => {
     setAccessToken();
     ROOT?.removeChild(document.querySelector('.column-container')!);
     await renderTracksView();
+    await renderLogoutButton();
 }
 
 /**
@@ -133,6 +134,7 @@ const displayFooter = () => {
     let footer: HTMLElement = document.createElement('footer');
     footer.style.textAlign = 'center';
     footer.innerHTML = 'That\'s all folks!';
+    footer.onclick = returnToTop;
 
     ROOT?.appendChild(footer);
     limitReached = true;
@@ -212,6 +214,43 @@ const onScroll = async () => {
 }
 
 /**
+ * Create and display a logout button.
+ */
+const renderLogoutButton = async () => {
+    const logoutBtn = document.createElement('button');
+    logoutBtn.classList.add('logout-button');
+    logoutBtn.onclick = await logout;
+    logoutBtn.innerHTML = `❌`;
+    ROOT?.appendChild(logoutBtn);
+}
+
+/**
+ * Wipe the user's local storage and navigate him
+ * to the login page.
+ */
+const logout = async () => {
+    const tracks = document.querySelectorAll('.track');
+    const logoutBtn = document.querySelector('.logout-button');
+    const footer = document.querySelector('footer');
+    for (const track of Array.from(tracks)) {
+        ROOT?.removeChild(track)
+    }
+    if (logoutBtn) ROOT?.removeChild(logoutBtn);
+    if (footer) ROOT?.removeChild(footer);
+    localStorage.clear();
+    await displayLogin();
+}
+
+/**
+ * Return the user to the top of the page.
+ * Invoked on footer click.
+ */
+const returnToTop = () => {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+}
+
+/**
 * Check if the user has an access token stored in the local storage.
 * If yes, perform the fetch, if not, display the "login" screen.
 */
@@ -222,6 +261,7 @@ window.addEventListener('load', async () => {
     }
 
     await renderTracksView();
+    await renderLogoutButton();
 });
 
 /**
