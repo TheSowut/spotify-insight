@@ -214,19 +214,8 @@ const onScroll = async () => {
 }
 
 /**
-* Check if the user has an access token stored in the local storage.
-* If yes, perform the fetch, if not, display the "login" screen.
-*/
-window.addEventListener('load', async () => {
-    if (!localStorage.getItem('access_token')) {
-        await displayLogin();
-        return;
-    }
-
-    await renderTracksView();
-    await renderLogoutButton();
-});
-
+ * Create and display a logout button.
+ */
 const renderLogoutButton = async () => {
     const logoutBtn = document.createElement('button');
     logoutBtn.classList.add('logout-button');
@@ -235,6 +224,10 @@ const renderLogoutButton = async () => {
     ROOT?.appendChild(logoutBtn);
 }
 
+/**
+ * Wipe the user's local storage and navigate him
+ * to the login page.
+ */
 const logout = async () => {
     const tracks = document.querySelectorAll('.track');
     const logoutBtn = document.querySelector('.logout-button');
@@ -256,6 +249,20 @@ const returnToTop = () => {
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
 }
+
+/**
+* Check if the user has an access token stored in the local storage.
+* If yes, perform the fetch, if not, display the "login" screen.
+*/
+window.addEventListener('load', async () => {
+    if (!localStorage.getItem('access_token')) {
+        await displayLogin();
+        return;
+    }
+
+    await renderTracksView();
+    await renderLogoutButton();
+});
 
 /**
 * When the users performs a mouse scroll, check his location.
