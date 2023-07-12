@@ -11,6 +11,10 @@
     align-items: center;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     background: #1DB954;
 }
@@ -35,6 +39,7 @@ input:focus {
 
 footer {
     font-style: italic;
+    cursor: pointer;
 }
 
 a {

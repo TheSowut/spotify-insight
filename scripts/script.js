@@ -191,6 +191,7 @@ var displayFooter = function () {
     var footer = document.createElement('footer');
     footer.style.textAlign = 'center';
     footer.innerHTML = 'That\'s all folks!';
+    footer.onclick = returnToTop;
     ROOT === null || ROOT === void 0 ? void 0 : ROOT.appendChild(footer);
     limitReached = true;
 };
@@ -338,6 +339,10 @@ var logout = function () { return __awaiter(_this, void 0, void 0, function () {
         }
     });
 }); };
+var returnToTop = function () {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+};
 /**
 * When the users performs a mouse scroll, check his location.
 */

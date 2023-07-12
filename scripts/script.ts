@@ -134,6 +134,7 @@ const displayFooter = () => {
     let footer: HTMLElement = document.createElement('footer');
     footer.style.textAlign = 'center';
     footer.innerHTML = 'That\'s all folks!';
+    footer.onclick = returnToTop;
 
     ROOT?.appendChild(footer);
     limitReached = true;
@@ -245,6 +246,15 @@ const logout = async () => {
     if (footer) ROOT?.removeChild(footer);
     localStorage.clear();
     await displayLogin();
+}
+
+/**
+ * Return the user to the top of the page.
+ * Invoked on footer click.
+ */
+const returnToTop = () => {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
 }
 
 /**
