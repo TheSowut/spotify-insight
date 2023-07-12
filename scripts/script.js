@@ -276,6 +276,74 @@ var onScroll = function () { return __awaiter(_this, void 0, void 0, function ()
     });
 }); };
 /**
+ * Create and display a logout button.
+ */
+var renderLogoutButton = function () { return __awaiter(_this, void 0, void 0, function () {
+    var logoutBtn, _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                logoutBtn = document.createElement('button');
+                logoutBtn.classList.add('logout-button');
+                _a = logoutBtn;
+                return [4 /*yield*/, logout];
+            case 1:
+                _a.onclick = _b.sent();
+                logoutBtn.innerHTML = "\u274C";
+                ROOT === null || ROOT === void 0 ? void 0 : ROOT.appendChild(logoutBtn);
+                return [2 /*return*/];
+        }
+    });
+}); };
+/**
+ * Wipe the user's local storage and navigate him
+ * to the login page.
+ */
+var logout = function () { return __awaiter(_this, void 0, void 0, function () {
+    var tracks, logoutBtn, footer, _i, _a, track;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                tracks = document.querySelectorAll('.track');
+                logoutBtn = document.querySelector('.logout-button');
+                footer = document.querySelector('footer');
+                for (_i = 0, _a = Array.from(tracks); _i < _a.length; _i++) {
+                    track = _a[_i];
+                    ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(track);
+                }
+                if (logoutBtn)
+                    ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(logoutBtn);
+                if (footer)
+                    ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(footer);
+                resetState();
+                return [4 /*yield*/, displayLogin()];
+            case 1:
+                _b.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
+/**
+ * Return the user to the top of the page.
+ * Invoked on footer click.
+ */
+var returnToTop = function () {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+};
+/**
+ * Wipe the app cached data.
+ * Invoked by logout.
+ */
+var resetState = function () {
+    localStorage.clear();
+    totalCount = 0;
+    accessToken = '';
+    data = [];
+    limitReached = false;
+    trackPosition = 0;
+};
+/**
 * Check if the user has an access token stored in the local storage.
 * If yes, perform the fetch, if not, display the "login" screen.
 */
@@ -298,51 +366,6 @@ window.addEventListener('load', function () { return __awaiter(_this, void 0, vo
         }
     });
 }); });
-var renderLogoutButton = function () { return __awaiter(_this, void 0, void 0, function () {
-    var logoutBtn, _a;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0:
-                logoutBtn = document.createElement('button');
-                logoutBtn.classList.add('logout-button');
-                _a = logoutBtn;
-                return [4 /*yield*/, logout];
-            case 1:
-                _a.onclick = _b.sent();
-                logoutBtn.innerHTML = "\u274C";
-                ROOT === null || ROOT === void 0 ? void 0 : ROOT.appendChild(logoutBtn);
-                return [2 /*return*/];
-        }
-    });
-}); };
-var logout = function () { return __awaiter(_this, void 0, void 0, function () {
-    var tracks, logoutBtn, footer, _i, _a, track;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0:
-                tracks = document.querySelectorAll('.track');
-                logoutBtn = document.querySelector('.logout-button');
-                footer = document.querySelector('footer');
-                for (_i = 0, _a = Array.from(tracks); _i < _a.length; _i++) {
-                    track = _a[_i];
-                    ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(track);
-                }
-                if (logoutBtn)
-                    ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(logoutBtn);
-                if (footer)
-                    ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(footer);
-                localStorage.clear();
-                return [4 /*yield*/, displayLogin()];
-            case 1:
-                _b.sent();
-                return [2 /*return*/];
-        }
-    });
-}); };
-var returnToTop = function () {
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-};
 /**
 * When the users performs a mouse scroll, check his location.
 */

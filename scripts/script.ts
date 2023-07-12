@@ -237,7 +237,7 @@ const logout = async () => {
     }
     if (logoutBtn) ROOT?.removeChild(logoutBtn);
     if (footer) ROOT?.removeChild(footer);
-    localStorage.clear();
+    resetState();
     await displayLogin();
 }
 
@@ -248,6 +248,20 @@ const logout = async () => {
 const returnToTop = () => {
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
+}
+
+/**
+ * Wipe the app cached data.
+ * Invoked by logout.
+ */
+const resetState = () => {
+    localStorage.clear();
+
+    totalCount = 0;
+    accessToken = '';
+    data = [];
+    limitReached = false;
+    trackPosition = 0;
 }
 
 /**
