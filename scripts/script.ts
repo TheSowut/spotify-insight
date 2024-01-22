@@ -271,7 +271,17 @@ const resetState = () => {
 window.addEventListener('load', async () => {
     if (!localStorage.getItem('access_token')) {
         await displayLogin();
-        return;
+
+        const searchParams = new URLSearchParams(window.location.search);
+        const authorizationCode = searchParams.get('code');
+        alert(authorizationCode);
+
+        // if (authorizationCode) {
+        //     // Do something with the authorization code, such as making a request to exchange it for an access token
+        //     console.log('Authorization Code:', authorizationCode);
+        // } else {
+        //     console.error('Authorization code not found in the URL');
+        // }
     }
 
     await renderTracksView();
