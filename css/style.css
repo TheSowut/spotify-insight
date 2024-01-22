@@ -109,6 +109,19 @@ footer {
     background-color: #881db9;
 }
 
+
+.test-button {
+    width: 30px;
+    margin-left: 15px;
+    cursor: pointer;
+    transition: .5s all;
+
+    background: yellow;
+    padding: 10px;
+    border-radius: 30%;
+    border: 3px solid #191414;
+}
+
 .logout-button {
     position: absolute;
     top: 0;

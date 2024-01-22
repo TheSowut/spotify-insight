@@ -13,6 +13,7 @@ const EMOJIS = [
     '🎻'
 ];
 const MAX_AMOUNT_OF_TRACKS: number = 50;
+const CLIENT_ID: string = '0edc943739304bb8bb3521dddd210510';
 enum SCREEN {
     LOGIN,
     SHOWCASE
@@ -93,6 +94,50 @@ const submitToken = async () => {
 }
 
 /**
+ * step 1
+ */
+const connectWithSpotify = async () => {
+    const scope = 'user-read-private user-read-email';
+    const redirectUri = 'https://thesowut.github.io/spotify-insight/';
+    const codeChallenge = '4abc';
+    const authorizationUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${redirectUri}&code_challenge=${codeChallenge}&code_challenge_method=S256&scope=${encodeURIComponent(scope)}`;
+    window.location.href = authorizationUrl;
+}
+
+/**
+ * step 2
+ * @param code
+ */
+const authorizeWithSpotify = async (code: string) => {
+    const requestBody = new URLSearchParams(window.location.search);
+    const challengeEncoded = requestBody.get('code_challenge');
+    const accessToken = requestBody.get('code');
+    const codeChallenge = verifyCodeChallenge(challengeEncoded, accessToken);
+
+
+    requestBody.append('grant_type', 'authorization_code');
+    requestBody.append('redirect_uri', 'https://thesowut.github.io/spotify-insight/');
+    requestBody.append('client_id', '0edc943739304bb8bb3521dddd210510');
+    requestBody.append('code', code);
+    // TODO
+    // requestBody.append('code_verifier', codeChallenge);
+
+    const res = await fetch(`https://accounts.spotify.com/api/token`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: requestBody.toString(),
+    }).then(res => res.json()).then(res => {
+        alert(JSON.stringify(res));
+
+        localStorage.setItem('refresh_token', res.refresh_token);
+        localStorage.setItem('access_token', res.access_token);
+        // test(res.access_token);
+    })
+}
+
+/**
 * Display the access token input field.
 */
 const displayLogin = async () => {
@@ -118,9 +163,14 @@ const displayLogin = async () => {
     playButton.src = './images/play.png'
     playButton.onclick = await submitToken;
 
+    const testBtn = document.createElement('button');
+    testBtn.classList.add('test-button');
+    testBtn.onclick = await connectWithSpotify;
+
     // container.append(obtainToken);
     container.appendChild(input);
     container.appendChild(playButton);
+    container.appendChild(testBtn);
     rowContainer.appendChild(container);
     columnContainer.appendChild(rowContainer);
     ROOT?.appendChild(columnContainer);
@@ -269,24 +319,58 @@ const resetState = () => {
 * If yes, perform the fetch, if not, display the "login" screen.
 */
 window.addEventListener('load', async () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const authorizationCode = searchParams.get('code');
+    if (authorizationCode) {
+        authorizeWithSpotify(authorizationCode);
+    }
+
     if (!localStorage.getItem('access_token')) {
         await displayLogin();
-
-        const searchParams = new URLSearchParams(window.location.search);
-        const authorizationCode = searchParams.get('code');
-        alert(authorizationCode);
-
-        // if (authorizationCode) {
-        //     // Do something with the authorization code, such as making a request to exchange it for an access token
-        //     console.log('Authorization Code:', authorizationCode);
-        // } else {
-        //     console.error('Authorization code not found in the URL');
-        // }
+        return;
     }
 
     await renderTracksView();
     await renderLogoutButton();
 });
+
+const generateCode = (): string => {
+    const codeVerifierLength = 64;
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+
+    let codeVerifier = '';
+    for (let i = 0; i < codeVerifierLength; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        codeVerifier += characters.charAt(randomIndex);
+    }
+
+    return codeVerifier;
+}
+
+async function generateCodeChallenge(codeVerifier: any) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(codeVerifier);
+
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+
+    const base64urlEncoded = base64URLEncode(hashArray);
+    return base64urlEncoded;
+}
+
+function base64URLEncode(buffer: any) {
+    return btoa(String.fromCharCode.apply(null, buffer))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+}
+
+function verifyCodeChallenge(codeVerifier: any, authorizationCode: any) {
+  const calculatedCodeChallenge = generateCodeChallenge(codeVerifier);
+
+  // Compare calculated code challenge with the one received in the authorization code request
+  return calculatedCodeChallenge === authorizationCode;
+}
 
 /**
 * When the users performs a mouse scroll, check his location.

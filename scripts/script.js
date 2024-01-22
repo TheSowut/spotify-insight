@@ -59,6 +59,7 @@ var EMOJIS = [
     '🎻'
 ];
 var MAX_AMOUNT_OF_TRACKS = 50;
+var CLIENT_ID = '0edc943739304bb8bb3521dddd210510';
 var SCREEN;
 (function (SCREEN) {
     SCREEN[SCREEN["LOGIN"] = 0] = "LOGIN";
@@ -99,7 +100,7 @@ var renderTracksView = function () { return __awaiter(_this, void 0, void 0, fun
                     track = trackList_1[_i];
                     trackElement = document.createElement('div');
                     trackElement.classList.add('track');
-                    trackElement.innerHTML = "\n            <div>\n                <a href = \"" + track['uri'] + "\" target = \"_blank\">\n                    " + ++trackPosition + ". " + track['artists'][0]['name'] + " - " + track['name'] + "\n                </a>\n            </div>\n        ";
+                    trackElement.innerHTML = "\n            <div>\n                <a href = \"".concat(track['uri'], "\" target = \"_blank\">\n                    ").concat(++trackPosition, ". ").concat(track['artists'][0]['name'], " - ").concat(track['name'], "\n                </a>\n            </div>\n        ");
                     ROOT === null || ROOT === void 0 ? void 0 : ROOT.appendChild(trackElement);
                 }
                 return [2 /*return*/];
@@ -121,9 +122,9 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
             case 0:
                 tokenField = document.querySelector('input');
                 accessToken = tokenField.value;
-                return [4 /*yield*/, fetch("" + FETCH_URL + totalCount, {
+                return [4 /*yield*/, fetch("".concat(FETCH_URL).concat(totalCount), {
                         headers: {
-                            Authorization: "Bearer " + accessToken
+                            Authorization: "Bearer ".concat(accessToken)
                         }
                     })];
             case 1:
@@ -147,13 +148,55 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
         }
     });
 }); };
+var connectWithSpotify = function () { return __awaiter(_this, void 0, void 0, function () {
+    var scope, redirectUri, codeChallenge, authorizationUrl;
+    return __generator(this, function (_a) {
+        scope = 'user-read-private user-read-email';
+        redirectUri = 'https://thesowut.github.io/spotify-insight/';
+        codeChallenge = '4abc';
+        authorizationUrl = "https://accounts.spotify.com/authorize?client_id=".concat(CLIENT_ID, "&response_type=code&redirect_uri=").concat(redirectUri, "&code_challenge=").concat(codeChallenge, "&code_challenge_method=S256&scope=").concat(encodeURIComponent(scope));
+        window.location.href = authorizationUrl;
+        return [2 /*return*/];
+    });
+}); };
+var authorizeWithSpotify = function (code) { return __awaiter(_this, void 0, void 0, function () {
+    var requestBody, secretCode, codeChallenge, res;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                requestBody = new URLSearchParams();
+                secretCode = generateCode();
+                codeChallenge = generateCodeChallenge(secretCode);
+                requestBody.append('grant_type', 'authorization_code');
+                requestBody.append('redirect_uri', 'https://thesowut.github.io/spotify-insight/');
+                requestBody.append('client_id', '0edc943739304bb8bb3521dddd210510');
+                requestBody.append('code', code);
+                requestBody.append('code_verifier', secretCode);
+                return [4 /*yield*/, fetch("https://accounts.spotify.com/api/token", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: requestBody.toString()
+                    }).then(function (res) { return res.json(); }).then(function (res) {
+                        alert(JSON.stringify(res));
+                        localStorage.setItem('refresh_token', res.refresh_token);
+                        localStorage.setItem('access_token', res.access_token);
+                        // test(res.access_token);
+                    })];
+            case 1:
+                res = _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
 /**
 * Display the access token input field.
 */
 var displayLogin = function () { return __awaiter(_this, void 0, void 0, function () {
-    var rowContainer, columnContainer, container, input, playButton, _a;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+    var rowContainer, columnContainer, container, input, playButton, _a, testBtn, _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
             case 0:
                 activeScreen = SCREEN.LOGIN;
                 rowContainer = document.createElement('div');
@@ -172,10 +215,17 @@ var displayLogin = function () { return __awaiter(_this, void 0, void 0, functio
                 _a = playButton;
                 return [4 /*yield*/, submitToken];
             case 1:
-                _a.onclick = _b.sent();
+                _a.onclick = _c.sent();
+                testBtn = document.createElement('button');
+                testBtn.classList.add('test-button');
+                _b = testBtn;
+                return [4 /*yield*/, connectWithSpotify];
+            case 2:
+                _b.onclick = _c.sent();
                 // container.append(obtainToken);
                 container.appendChild(input);
                 container.appendChild(playButton);
+                container.appendChild(testBtn);
                 rowContainer.appendChild(container);
                 columnContainer.appendChild(rowContainer);
                 ROOT === null || ROOT === void 0 ? void 0 : ROOT.appendChild(columnContainer);
@@ -199,7 +249,7 @@ var displayFooter = function () {
  * Pick a random musical emoji and prefix it to the website title.
  */
 var updateWebsiteTitle = function () {
-    document.title = EMOJIS[Math.floor(Math.random() * EMOJIS.length)] + " Spotify Insight";
+    document.title = "".concat(EMOJIS[Math.floor(Math.random() * EMOJIS.length)], " Spotify Insight");
 };
 /**
  * If an API call is being made display a spinner.
@@ -229,9 +279,9 @@ var fetchData = function () { return __awaiter(_this, void 0, void 0, function (
         switch (_a.label) {
             case 0:
                 toggleSpinner();
-                return [4 /*yield*/, fetch("" + FETCH_URL + totalCount, {
+                return [4 /*yield*/, fetch("".concat(FETCH_URL).concat(totalCount), {
                         headers: {
-                            Authorization: "Bearer " + accessToken
+                            Authorization: "Bearer ".concat(accessToken)
                         }
                     }).then(function (res) { return res.json(); })];
             case 1:
@@ -348,9 +398,15 @@ var resetState = function () {
 * If yes, perform the fetch, if not, display the "login" screen.
 */
 window.addEventListener('load', function () { return __awaiter(_this, void 0, void 0, function () {
+    var searchParams, authorizationCode;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
+                searchParams = new URLSearchParams(window.location.search);
+                authorizationCode = searchParams.get('code');
+                if (authorizationCode) {
+                    authorizeWithSpotify(authorizationCode);
+                }
                 if (!!localStorage.getItem('access_token')) return [3 /*break*/, 2];
                 return [4 /*yield*/, displayLogin()];
             case 1:
@@ -366,6 +422,40 @@ window.addEventListener('load', function () { return __awaiter(_this, void 0, vo
         }
     });
 }); });
+var generateCode = function () {
+    var codeVerifierLength = 64;
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+    var codeVerifier = '';
+    for (var i = 0; i < codeVerifierLength; i++) {
+        var randomIndex = Math.floor(Math.random() * characters.length);
+        codeVerifier += characters.charAt(randomIndex);
+    }
+    return codeVerifier;
+};
+function generateCodeChallenge(codeVerifier) {
+    return __awaiter(this, void 0, void 0, function () {
+        var encoder, data, hashBuffer, hashArray, base64urlEncoded;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    encoder = new TextEncoder();
+                    data = encoder.encode(codeVerifier);
+                    return [4 /*yield*/, crypto.subtle.digest('SHA-256', data)];
+                case 1:
+                    hashBuffer = _a.sent();
+                    hashArray = Array.from(new Uint8Array(hashBuffer));
+                    base64urlEncoded = base64URLEncode(hashArray);
+                    return [2 /*return*/, base64urlEncoded];
+            }
+        });
+    });
+}
+function base64URLEncode(buffer) {
+    return btoa(String.fromCharCode.apply(null, buffer))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+}
 /**
 * When the users performs a mouse scroll, check his location.
 */
