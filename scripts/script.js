@@ -19,6 +19,7 @@ let data = [];
 let limitReached = false;
 let trackPosition = 0;
 let activeScreen;
+let PKCEClient = new CustomPKCEAuthorization();
 /**
 * If limit has been reached or a fetch request is being performed, exit.
 * Otherwise validate user access token and perform the API call.
@@ -86,14 +87,14 @@ const initiateLogin = () => __awaiter(void 0, void 0, void 0, function* () {
     yield renderLogoutButton();
 });
 /**
- * step 1
+ * Authotize with spotify account to receive an authotization code,
+ * which is used to obtain an acess token.
  */
 const connectWithSpotify = () => __awaiter(void 0, void 0, void 0, function* () {
     const scope = 'user-top-read user-read-private user-read-email';
     // const redirectUri = 'https://thesowut.github.io/spotify-insight/';
     const redirectUri = 'http://localhost:5500';
-    const test = new CustomPKCEAuthorization();
-    const codeChallenge = yield test.obtainCodeChallenge();
+    const codeChallenge = yield PKCEClient.obtainCodeChallenge();
     const authUri = new URL("https://accounts.spotify.com/authorize");
     const params = {
         response_type: 'code',
@@ -229,6 +230,8 @@ const toggleSpinner = () => {
  */
 const fetchData = () => __awaiter(void 0, void 0, void 0, function* () {
     toggleSpinner();
+    // TODO implement logic of refreshing the access token if refresh token is present
+    // if it fails, reset the state
     const response = yield fetch(`${FETCH_URL}${totalCount}`, {
         headers: {
             Authorization: `Bearer ${accessToken}`

@@ -8,7 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 /**
- *
+ * Custom implementation of the PKCE Authorization Flow.
+ * 1. Generate Random String.
+ * 2. Hash it.
+ * 3. Base 64 encode the hash to be used as code challenge.
  */
 export class CustomPKCEAuthorization {
     constructor() {
@@ -44,7 +47,7 @@ export class CustomPKCEAuthorization {
                 .replace(/\//g, '_');
         };
         /**
-         * Generate a codew verifier and challenge to be used during the authorization.
+         * Generate a code verifier and challenge to be used during the authorization.
          * @returns
          */
         this.obtainCodeChallenge = () => __awaiter(this, void 0, void 0, function* () {
