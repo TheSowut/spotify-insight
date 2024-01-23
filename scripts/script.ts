@@ -1,23 +1,7 @@
-// Constants
-const ROOT = document.querySelector('#root');
-const FETCH_URL: string = 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=10&offset=';
-const EMOJIS = [
-    '🎼',
-    '🎵',
-    '🎶',
-    '🎧',
-    '🎸',
-    '🎹',
-    '🎷',
-    '🎺',
-    '🎻'
-];
-const MAX_AMOUNT_OF_TRACKS: number = 50;
-const CLIENT_ID: string = '0edc943739304bb8bb3521dddd210510';
-enum SCREEN {
-    LOGIN,
-    SHOWCASE
-}
+import { CustomPKCEAuthorization } from "./auth/auth.js";
+import { CLIENT_ID, EMOJIS, FETCH_URL, MAX_AMOUNT_OF_TRACKS, ROOT } from "./constants/const.js";
+import { MESSAGE  } from "./enums/message.js";
+import { SCREEN } from "./enums/screen.js";
 
 // Variables
 let totalCount: number = 0;
@@ -61,6 +45,9 @@ const renderTracksView = async () => {
     }
 }
 
+/**
+ * Fetch the access_token from the local storage and save it as a variable for further usage.
+ */
 const setAccessToken = () => {
     accessToken = localStorage.getItem('access_token')!;
 }
@@ -73,10 +60,14 @@ const setAccessToken = () => {
 const submitToken = async () => {
     const tokenField = document.querySelector('input');
     accessToken = tokenField!.value;
-    testLogin();
+    initiateLogin();
 }
 
-const testLogin = async () => {
+/**
+ * Start the login procedure.
+ * @returns
+ */
+const initiateLogin = async () => {
     const res = await fetch(`${FETCH_URL}${totalCount}`, {
         headers: {
             Authorization: `Bearer ${accessToken}`
@@ -84,13 +75,8 @@ const testLogin = async () => {
     });
 
     if (res.status !== 200) {
-        localStorage.clear();
-        alert('Invalid access token!');
-        updateWebsiteTitle();
-
-        const inputField = document.querySelector('input');
-        if (inputField) inputField.value = '';
-        return;
+        alert(MESSAGE.INVALID_ACCESS_TOKEN);
+        return resetState();
     }
 
     const columnContainer = document.querySelector('.column-container');
@@ -107,7 +93,8 @@ const connectWithSpotify = async () => {
     const scope = 'user-top-read user-read-private user-read-email';
     // const redirectUri = 'https://thesowut.github.io/spotify-insight/';
     const redirectUri = 'http://localhost:5500';
-    const codeChallenge = await obtainCodeChallenge();
+    const test = new CustomPKCEAuthorization();
+    const codeChallenge = await test.obtainCodeChallenge();
     const authUri = new URL("https://accounts.spotify.com/authorize");
 
     const params = {
@@ -124,14 +111,25 @@ const connectWithSpotify = async () => {
 }
 
 /**
- * step 2
+ * If 'code' provided as a URL-encoded parameter, try to verify it.
+ * If it's correct, load list of tracks.
+ * If not, return error.
+ *
  * @param code
  */
 const authorizeWithSpotify = async (code: string) => {
-    const codeVerifier: string = localStorage.getItem('code_verifier')!;
+    const codeVerifier: string | null = localStorage.getItem('code_verifier');
     // const redirectUri = 'https://thesowut.github.io/spotify-insight/';
     const redirectUri = 'http://localhost:5500';
     const url = 'https://accounts.spotify.com/api/token';
+
+    if (!codeVerifier) {
+        alert(MESSAGE.INVALID_ACCESS_TOKEN);
+        resetState();
+
+        return displayLogin();
+    }
+
     const payload: RequestInit = {
         method: 'POST',
         headers: {
@@ -152,7 +150,7 @@ const authorizeWithSpotify = async (code: string) => {
             accessToken = res.access_token;
             localStorage.setItem('access_token', res.access_token);
             localStorage.setItem('refresh_token', res.refresh_token);
-            testLogin();
+            initiateLogin();
         });
 }
 
@@ -187,13 +185,12 @@ const displayLogin = async () => {
     spotifyButtonContainer.classList.add('spotify-image-container');
 
     // Connect with spotify button.
-    const testBtn = document.createElement('img');
-    testBtn.classList.add('test-button');
-    // testBtn.src = './images/spotify_logo.png';
-    testBtn.src = './images/spotify_logo.svg';
-    testBtn.onclick = await connectWithSpotify;
+    const connectWithSpotifyButton = document.createElement('img');
+    connectWithSpotifyButton.classList.add('connect-with-spotify-button');
+    connectWithSpotifyButton.src = './images/spotify_logo.svg';
+    connectWithSpotifyButton.onclick = await connectWithSpotify;
 
-    spotifyButtonContainer.appendChild(testBtn);
+    spotifyButtonContainer.appendChild(connectWithSpotifyButton);
     container.appendChild(input);
     container.appendChild(playButton);
     container.appendChild(spotifyButtonContainer);
@@ -334,6 +331,9 @@ const resetState = () => {
     localStorage.clear();
     updateWebsiteTitle();
 
+    const inputField = document.querySelector('input');
+    if (inputField) inputField.value = '';
+
     totalCount = 0;
     accessToken = '';
     data = [];
@@ -360,35 +360,6 @@ window.addEventListener('load', async () => {
     await renderTracksView();
     await renderLogoutButton();
 });
-
-const generateRandomString = (length: number = 64) => {
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const values = crypto.getRandomValues(new Uint8Array(length));
-
-    return values.reduce((acc, x) => acc + possible[x % possible.length], '');
-}
-
-const sha256 = async (plain: string) => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(plain);
-
-    return window.crypto.subtle.digest('SHA-256', data);
-}
-
-const base64encode = (input: any) => {
-    return btoa(String.fromCharCode(...new Uint8Array(input)))
-        .replace(/=/g, '')
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-}
-
-const obtainCodeChallenge = async () => {
-    const codeVerifier = generateRandomString(64);
-    window.localStorage.setItem('code_verifier', codeVerifier);
-
-    const hashed = await sha256(codeVerifier);
-    return base64encode(hashed);
-}
 
 /**
 * When the users performs a mouse scroll, check his location.
