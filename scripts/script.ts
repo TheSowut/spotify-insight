@@ -86,7 +86,7 @@ const testLogin = async () => {
     if (res.status !== 200) {
         localStorage.clear();
         alert('Invalid access token!');
-        history.pushState({}, `${EMOJIS[Math.floor(Math.random() * EMOJIS.length)]} Spotify Insight`, '/');
+        updateWebsiteTitle();
 
         const inputField = document.querySelector('input');
         if (inputField) inputField.value = '';
@@ -182,14 +182,21 @@ const displayLogin = async () => {
     playButton.src = './images/play.png'
     playButton.onclick = await submitToken;
 
-    const testBtn = document.createElement('button');
+    // Spotify button container.
+    const spotifyButtonContainer = document.createElement('div');
+    spotifyButtonContainer.classList.add('spotify-image-container');
+
+    // Connect with spotify button.
+    const testBtn = document.createElement('img');
     testBtn.classList.add('test-button');
+    // testBtn.src = './images/spotify_logo.png';
+    testBtn.src = './images/spotify_logo.svg';
     testBtn.onclick = await connectWithSpotify;
 
-    // container.append(obtainToken);
+    spotifyButtonContainer.appendChild(testBtn);
     container.appendChild(input);
     container.appendChild(playButton);
-    container.appendChild(testBtn);
+    container.appendChild(spotifyButtonContainer);
     rowContainer.appendChild(container);
     columnContainer.appendChild(rowContainer);
     ROOT?.appendChild(columnContainer);
@@ -213,7 +220,7 @@ const displayFooter = () => {
  * Pick a random musical emoji and prefix it to the website title.
  */
 const updateWebsiteTitle = () => {
-    document.title = `${EMOJIS[Math.floor(Math.random() * EMOJIS.length)]} Spotify Insight`;
+    history.pushState({}, `${EMOJIS[Math.floor(Math.random() * EMOJIS.length)]} Spotify Insight`, '/');
 }
 
 /**
@@ -325,7 +332,7 @@ const returnToTop = () => {
  */
 const resetState = () => {
     localStorage.clear();
-    history.pushState({}, `${EMOJIS[Math.floor(Math.random() * EMOJIS.length)]} Spotify Insight`, '/');
+    updateWebsiteTitle();
 
     totalCount = 0;
     accessToken = '';

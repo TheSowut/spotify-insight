@@ -70,7 +70,6 @@ a:hover {
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    width: 20%;
     font-size: 1.5em;
 }
 
@@ -109,17 +108,25 @@ footer {
     background-color: #881db9;
 }
 
+.spotify-image-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    overflow: hidden;
+    width: 2.75em;
+
+    margin-left: 3%;
+}
 
 .test-button {
-    width: 30px;
-    margin-left: 15px;
+    max-width: 100%;
+    max-height: 100%;
     cursor: pointer;
-    transition: .5s all;
+}
 
-    background: yellow;
-    padding: 10px;
-    border-radius: 30%;
-    border: 3px solid #191414;
+.test-button:hover {
+    animation: spotify-spin 0.6s normal;
 }
 
 .logout-button {
@@ -193,6 +200,20 @@ footer {
 
     100% {
         transform: scale(0);
+    }
+}
+
+@keyframes spotify-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(45deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
     }
 }
 

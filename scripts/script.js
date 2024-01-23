@@ -138,7 +138,7 @@ var testLogin = function () { return __awaiter(_this, void 0, void 0, function (
                 if (res.status !== 200) {
                     localStorage.clear();
                     alert('Invalid access token!');
-                    history.pushState({}, "".concat(EMOJIS[Math.floor(Math.random() * EMOJIS.length)], " Spotify Insight"), '/');
+                    updateWebsiteTitle();
                     inputField = document.querySelector('input');
                     if (inputField)
                         inputField.value = '';
@@ -228,7 +228,7 @@ var authorizeWithSpotify = function (code) { return __awaiter(_this, void 0, voi
 * Display the access token input field.
 */
 var displayLogin = function () { return __awaiter(_this, void 0, void 0, function () {
-    var rowContainer, columnContainer, container, input, playButton, _a, testBtn, _b;
+    var rowContainer, columnContainer, container, input, playButton, _a, spotifyButtonContainer, testBtn, _b;
     return __generator(this, function (_c) {
         switch (_c.label) {
             case 0:
@@ -250,16 +250,20 @@ var displayLogin = function () { return __awaiter(_this, void 0, void 0, functio
                 return [4 /*yield*/, submitToken];
             case 1:
                 _a.onclick = _c.sent();
-                testBtn = document.createElement('button');
+                spotifyButtonContainer = document.createElement('div');
+                spotifyButtonContainer.classList.add('spotify-image-container');
+                testBtn = document.createElement('img');
                 testBtn.classList.add('test-button');
+                // testBtn.src = './images/spotify_logo.png';
+                testBtn.src = './images/spotify_logo.svg';
                 _b = testBtn;
                 return [4 /*yield*/, connectWithSpotify];
             case 2:
                 _b.onclick = _c.sent();
-                // container.append(obtainToken);
+                spotifyButtonContainer.appendChild(testBtn);
                 container.appendChild(input);
                 container.appendChild(playButton);
-                container.appendChild(testBtn);
+                container.appendChild(spotifyButtonContainer);
                 rowContainer.appendChild(container);
                 columnContainer.appendChild(rowContainer);
                 ROOT === null || ROOT === void 0 ? void 0 : ROOT.appendChild(columnContainer);
@@ -283,7 +287,7 @@ var displayFooter = function () {
  * Pick a random musical emoji and prefix it to the website title.
  */
 var updateWebsiteTitle = function () {
-    document.title = "".concat(EMOJIS[Math.floor(Math.random() * EMOJIS.length)], " Spotify Insight");
+    history.pushState({}, "".concat(EMOJIS[Math.floor(Math.random() * EMOJIS.length)], " Spotify Insight"), '/');
 };
 /**
  * If an API call is being made display a spinner.
@@ -421,7 +425,7 @@ var returnToTop = function () {
  */
 var resetState = function () {
     localStorage.clear();
-    history.pushState({}, "".concat(EMOJIS[Math.floor(Math.random() * EMOJIS.length)], " Spotify Insight"), '/');
+    updateWebsiteTitle();
     totalCount = 0;
     accessToken = '';
     data = [];
