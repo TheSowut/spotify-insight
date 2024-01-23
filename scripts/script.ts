@@ -73,6 +73,10 @@ const setAccessToken = () => {
 const submitToken = async () => {
     const tokenField = document.querySelector('input');
     accessToken = tokenField!.value;
+    testLogin();
+}
+
+const testLogin = async () => {
     const res = await fetch(`${FETCH_URL}${totalCount}`, {
         headers: {
             Authorization: `Bearer ${accessToken}`
@@ -82,13 +86,16 @@ const submitToken = async () => {
     if (res.status !== 200) {
         localStorage.clear();
         alert('Invalid access token!');
-        tokenField!.value = "";
+        history.pushState({}, `${EMOJIS[Math.floor(Math.random() * EMOJIS.length)]} Spotify Insight`, '/');
+
+        const inputField = document.querySelector('input');
+        if (inputField) inputField.value = '';
         return;
     }
 
-    localStorage.setItem('access_token', accessToken);
-    setAccessToken();
-    ROOT?.removeChild(document.querySelector('.column-container')!);
+    const columnContainer = document.querySelector('.column-container');
+    if (columnContainer) ROOT?.removeChild(columnContainer);
+
     await renderTracksView();
     await renderLogoutButton();
 }
@@ -97,11 +104,23 @@ const submitToken = async () => {
  * step 1
  */
 const connectWithSpotify = async () => {
-    const scope = 'user-read-private user-read-email';
-    const redirectUri = 'https://thesowut.github.io/spotify-insight/';
-    const codeChallenge = '4abc';
-    const authorizationUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${redirectUri}&code_challenge=${codeChallenge}&code_challenge_method=S256&scope=${encodeURIComponent(scope)}`;
-    window.location.href = authorizationUrl;
+    const scope = 'user-top-read user-read-private user-read-email';
+    // const redirectUri = 'https://thesowut.github.io/spotify-insight/';
+    const redirectUri = 'http://localhost:5500';
+    const codeChallenge = await obtainCodeChallenge();
+    const authUri = new URL("https://accounts.spotify.com/authorize");
+
+    const params = {
+        response_type: 'code',
+        client_id: CLIENT_ID,
+        scope,
+        code_challenge_method: 'S256',
+        code_challenge: codeChallenge,
+        redirect_uri: redirectUri,
+    }
+
+    authUri.search = new URLSearchParams(params).toString();
+    window.location.href = authUri.toString();
 }
 
 /**
@@ -109,32 +128,32 @@ const connectWithSpotify = async () => {
  * @param code
  */
 const authorizeWithSpotify = async (code: string) => {
-    const requestBody = new URLSearchParams(window.location.search);
-    const challengeEncoded = requestBody.get('code_challenge');
-    const accessToken = requestBody.get('code');
-    const codeChallenge = verifyCodeChallenge(challengeEncoded, accessToken);
-
-
-    requestBody.append('grant_type', 'authorization_code');
-    requestBody.append('redirect_uri', 'https://thesowut.github.io/spotify-insight/');
-    requestBody.append('client_id', '0edc943739304bb8bb3521dddd210510');
-    requestBody.append('code', code);
-    // TODO
-    // requestBody.append('code_verifier', codeChallenge);
-
-    const res = await fetch(`https://accounts.spotify.com/api/token`, {
+    const codeVerifier: string = localStorage.getItem('code_verifier')!;
+    // const redirectUri = 'https://thesowut.github.io/spotify-insight/';
+    const redirectUri = 'http://localhost:5500';
+    const url = 'https://accounts.spotify.com/api/token';
+    const payload: RequestInit = {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: requestBody.toString(),
-    }).then(res => res.json()).then(res => {
-        alert(JSON.stringify(res));
+        body: new URLSearchParams({
+            client_id: CLIENT_ID,
+            grant_type: 'authorization_code',
+            code,
+            redirect_uri: redirectUri,
+            code_verifier: codeVerifier
+        })
+    }
 
-        localStorage.setItem('refresh_token', res.refresh_token);
-        localStorage.setItem('access_token', res.access_token);
-        // test(res.access_token);
-    })
+    await fetch(url, payload)
+        .then(res => res.json())
+        .then(res => {
+            accessToken = res.access_token;
+            localStorage.setItem('access_token', res.access_token);
+            localStorage.setItem('refresh_token', res.refresh_token);
+            testLogin();
+        });
 }
 
 /**
@@ -306,6 +325,7 @@ const returnToTop = () => {
  */
 const resetState = () => {
     localStorage.clear();
+    history.pushState({}, `${EMOJIS[Math.floor(Math.random() * EMOJIS.length)]} Spotify Insight`, '/');
 
     totalCount = 0;
     accessToken = '';
@@ -321,55 +341,46 @@ const resetState = () => {
 window.addEventListener('load', async () => {
     const searchParams = new URLSearchParams(window.location.search);
     const authorizationCode = searchParams.get('code');
+
     if (authorizationCode) {
-        authorizeWithSpotify(authorizationCode);
+        return await authorizeWithSpotify(authorizationCode);
     }
 
     if (!localStorage.getItem('access_token')) {
-        await displayLogin();
-        return;
+        return await displayLogin();
     }
 
     await renderTracksView();
     await renderLogoutButton();
 });
 
-const generateCode = (): string => {
-    const codeVerifierLength = 64;
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+const generateRandomString = (length: number = 64) => {
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const values = crypto.getRandomValues(new Uint8Array(length));
 
-    let codeVerifier = '';
-    for (let i = 0; i < codeVerifierLength; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        codeVerifier += characters.charAt(randomIndex);
-    }
-
-    return codeVerifier;
+    return values.reduce((acc, x) => acc + possible[x % possible.length], '');
 }
 
-async function generateCodeChallenge(codeVerifier: any) {
+const sha256 = async (plain: string) => {
     const encoder = new TextEncoder();
-    const data = encoder.encode(codeVerifier);
+    const data = encoder.encode(plain);
 
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-
-    const base64urlEncoded = base64URLEncode(hashArray);
-    return base64urlEncoded;
+    return window.crypto.subtle.digest('SHA-256', data);
 }
 
-function base64URLEncode(buffer: any) {
-    return btoa(String.fromCharCode.apply(null, buffer))
+const base64encode = (input: any) => {
+    return btoa(String.fromCharCode(...new Uint8Array(input)))
+        .replace(/=/g, '')
         .replace(/\+/g, '-')
         .replace(/\//g, '_')
-        .replace(/=+$/, '');
 }
 
-function verifyCodeChallenge(codeVerifier: any, authorizationCode: any) {
-  const calculatedCodeChallenge = generateCodeChallenge(codeVerifier);
+const obtainCodeChallenge = async () => {
+    const codeVerifier = generateRandomString(64);
+    window.localStorage.setItem('code_verifier', codeVerifier);
 
-  // Compare calculated code challenge with the one received in the authorization code request
-  return calculatedCodeChallenge === authorizationCode;
+    const hashed = await sha256(codeVerifier);
+    return base64encode(hashed);
 }
 
 /**

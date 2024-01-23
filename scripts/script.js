@@ -116,28 +116,37 @@ var setAccessToken = function () {
 * @returns
 */
 var submitToken = function () { return __awaiter(_this, void 0, void 0, function () {
-    var tokenField, res;
+    var tokenField;
+    return __generator(this, function (_a) {
+        tokenField = document.querySelector('input');
+        accessToken = tokenField.value;
+        testLogin();
+        return [2 /*return*/];
+    });
+}); };
+var testLogin = function () { return __awaiter(_this, void 0, void 0, function () {
+    var res, inputField, columnContainer;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                tokenField = document.querySelector('input');
-                accessToken = tokenField.value;
-                return [4 /*yield*/, fetch("".concat(FETCH_URL).concat(totalCount), {
-                        headers: {
-                            Authorization: "Bearer ".concat(accessToken)
-                        }
-                    })];
+            case 0: return [4 /*yield*/, fetch("".concat(FETCH_URL).concat(totalCount), {
+                    headers: {
+                        Authorization: "Bearer ".concat(accessToken)
+                    }
+                })];
             case 1:
                 res = _a.sent();
                 if (res.status !== 200) {
                     localStorage.clear();
                     alert('Invalid access token!');
-                    tokenField.value = "";
+                    history.pushState({}, "".concat(EMOJIS[Math.floor(Math.random() * EMOJIS.length)], " Spotify Insight"), '/');
+                    inputField = document.querySelector('input');
+                    if (inputField)
+                        inputField.value = '';
                     return [2 /*return*/];
                 }
-                localStorage.setItem('access_token', accessToken);
-                setAccessToken();
-                ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(document.querySelector('.column-container'));
+                columnContainer = document.querySelector('.column-container');
+                if (columnContainer)
+                    ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(columnContainer);
                 return [4 /*yield*/, renderTracksView()];
             case 2:
                 _a.sent();
@@ -148,44 +157,69 @@ var submitToken = function () { return __awaiter(_this, void 0, void 0, function
         }
     });
 }); };
+/**
+ * step 1
+ */
 var connectWithSpotify = function () { return __awaiter(_this, void 0, void 0, function () {
-    var scope, redirectUri, codeChallenge, authorizationUrl;
-    return __generator(this, function (_a) {
-        scope = 'user-read-private user-read-email';
-        redirectUri = 'https://thesowut.github.io/spotify-insight/';
-        codeChallenge = '4abc';
-        authorizationUrl = "https://accounts.spotify.com/authorize?client_id=".concat(CLIENT_ID, "&response_type=code&redirect_uri=").concat(redirectUri, "&code_challenge=").concat(codeChallenge, "&code_challenge_method=S256&scope=").concat(encodeURIComponent(scope));
-        window.location.href = authorizationUrl;
-        return [2 /*return*/];
-    });
-}); };
-var authorizeWithSpotify = function (code) { return __awaiter(_this, void 0, void 0, function () {
-    var requestBody, secretCode, codeChallenge, res;
+    var scope, redirectUri, codeChallenge, authUri, params;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                requestBody = new URLSearchParams();
-                secretCode = generateCode();
-                codeChallenge = generateCodeChallenge(secretCode);
-                requestBody.append('grant_type', 'authorization_code');
-                requestBody.append('redirect_uri', 'https://thesowut.github.io/spotify-insight/');
-                requestBody.append('client_id', '0edc943739304bb8bb3521dddd210510');
-                requestBody.append('code', code);
-                requestBody.append('code_verifier', secretCode);
-                return [4 /*yield*/, fetch("https://accounts.spotify.com/api/token", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: requestBody.toString()
-                    }).then(function (res) { return res.json(); }).then(function (res) {
-                        alert(JSON.stringify(res));
-                        localStorage.setItem('refresh_token', res.refresh_token);
+                scope = 'user-top-read user-read-private user-read-email';
+                redirectUri = 'http://localhost:5500';
+                return [4 /*yield*/, obtainCodeChallenge()];
+            case 1:
+                codeChallenge = _a.sent();
+                authUri = new URL("https://accounts.spotify.com/authorize");
+                params = {
+                    response_type: 'code',
+                    client_id: CLIENT_ID,
+                    scope: scope,
+                    code_challenge_method: 'S256',
+                    code_challenge: codeChallenge,
+                    redirect_uri: redirectUri
+                };
+                authUri.search = new URLSearchParams(params).toString();
+                window.location.href = authUri.toString();
+                return [2 /*return*/];
+        }
+    });
+}); };
+/**
+ * step 2
+ * @param code
+ */
+var authorizeWithSpotify = function (code) { return __awaiter(_this, void 0, void 0, function () {
+    var codeVerifier, redirectUri, url, payload;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                codeVerifier = localStorage.getItem('code_verifier');
+                redirectUri = 'http://localhost:5500';
+                url = 'https://accounts.spotify.com/api/token';
+                payload = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        client_id: CLIENT_ID,
+                        grant_type: 'authorization_code',
+                        code: code,
+                        redirect_uri: redirectUri,
+                        code_verifier: codeVerifier
+                    })
+                };
+                return [4 /*yield*/, fetch(url, payload)
+                        .then(function (res) { return res.json(); })
+                        .then(function (res) {
+                        accessToken = res.access_token;
                         localStorage.setItem('access_token', res.access_token);
-                        // test(res.access_token);
+                        localStorage.setItem('refresh_token', res.refresh_token);
+                        testLogin();
                     })];
             case 1:
-                res = _a.sent();
+                _a.sent();
                 return [2 /*return*/];
         }
     });
@@ -387,6 +421,7 @@ var returnToTop = function () {
  */
 var resetState = function () {
     localStorage.clear();
+    history.pushState({}, "".concat(EMOJIS[Math.floor(Math.random() * EMOJIS.length)], " Spotify Insight"), '/');
     totalCount = 0;
     accessToken = '';
     data = [];
@@ -404,58 +439,57 @@ window.addEventListener('load', function () { return __awaiter(_this, void 0, vo
             case 0:
                 searchParams = new URLSearchParams(window.location.search);
                 authorizationCode = searchParams.get('code');
-                if (authorizationCode) {
-                    authorizeWithSpotify(authorizationCode);
-                }
-                if (!!localStorage.getItem('access_token')) return [3 /*break*/, 2];
+                if (!authorizationCode) return [3 /*break*/, 2];
+                return [4 /*yield*/, authorizeWithSpotify(authorizationCode)];
+            case 1: return [2 /*return*/, _a.sent()];
+            case 2:
+                if (!!localStorage.getItem('access_token')) return [3 /*break*/, 4];
                 return [4 /*yield*/, displayLogin()];
-            case 1:
-                _a.sent();
-                return [2 /*return*/];
-            case 2: return [4 /*yield*/, renderTracksView()];
-            case 3:
+            case 3: return [2 /*return*/, _a.sent()];
+            case 4: return [4 /*yield*/, renderTracksView()];
+            case 5:
                 _a.sent();
                 return [4 /*yield*/, renderLogoutButton()];
-            case 4:
+            case 6:
                 _a.sent();
                 return [2 /*return*/];
         }
     });
 }); });
-var generateCode = function () {
-    var codeVerifierLength = 64;
-    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
-    var codeVerifier = '';
-    for (var i = 0; i < codeVerifierLength; i++) {
-        var randomIndex = Math.floor(Math.random() * characters.length);
-        codeVerifier += characters.charAt(randomIndex);
-    }
-    return codeVerifier;
+var generateRandomString = function (length) {
+    if (length === void 0) { length = 64; }
+    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var values = crypto.getRandomValues(new Uint8Array(length));
+    return values.reduce(function (acc, x) { return acc + possible[x % possible.length]; }, '');
 };
-function generateCodeChallenge(codeVerifier) {
-    return __awaiter(this, void 0, void 0, function () {
-        var encoder, data, hashBuffer, hashArray, base64urlEncoded;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    encoder = new TextEncoder();
-                    data = encoder.encode(codeVerifier);
-                    return [4 /*yield*/, crypto.subtle.digest('SHA-256', data)];
-                case 1:
-                    hashBuffer = _a.sent();
-                    hashArray = Array.from(new Uint8Array(hashBuffer));
-                    base64urlEncoded = base64URLEncode(hashArray);
-                    return [2 /*return*/, base64urlEncoded];
-            }
-        });
+var sha256 = function (plain) { return __awaiter(_this, void 0, void 0, function () {
+    var encoder, data;
+    return __generator(this, function (_a) {
+        encoder = new TextEncoder();
+        data = encoder.encode(plain);
+        return [2 /*return*/, window.crypto.subtle.digest('SHA-256', data)];
     });
-}
-function base64URLEncode(buffer) {
-    return btoa(String.fromCharCode.apply(null, buffer))
+}); };
+var base64encode = function (input) {
+    return btoa(String.fromCharCode.apply(String, new Uint8Array(input)))
+        .replace(/=/g, '')
         .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '');
-}
+        .replace(/\//g, '_');
+};
+var obtainCodeChallenge = function () { return __awaiter(_this, void 0, void 0, function () {
+    var codeVerifier, hashed;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                codeVerifier = generateRandomString(64);
+                window.localStorage.setItem('code_verifier', codeVerifier);
+                return [4 /*yield*/, sha256(codeVerifier)];
+            case 1:
+                hashed = _a.sent();
+                return [2 /*return*/, base64encode(hashed)];
+        }
+    });
+}); };
 /**
 * When the users performs a mouse scroll, check his location.
 */
