@@ -1,12 +1,11 @@
 import { CustomPKCEAuthorization } from "./auth/auth.js";
 import { CLIENT_ID, EMOJIS, FETCH_URL, MAX_AMOUNT_OF_TRACKS, ROOT } from "./constants/const.js";
-import { MESSAGE  } from "./enums/message.js";
+import { MESSAGE } from "./enums/message.js";
 import { SCREEN } from "./enums/screen.js";
 
 // Variables
 let totalCount: number = 0;
 let isFetching: boolean = false;
-let accessToken: string = '';
 let data: any[] = [];
 let limitReached: boolean = false;
 let trackPosition: number = 0;
@@ -27,8 +26,6 @@ const renderTracksView = async () => {
         return;
     }
 
-    if (!accessToken.length) setAccessToken();
-
     let trackList = await fetchData();
     totalCount += trackList.length;
 
@@ -47,20 +44,13 @@ const renderTracksView = async () => {
 }
 
 /**
- * Fetch the access_token from the local storage and save it as a variable for further usage.
- */
-const setAccessToken = () => {
-    accessToken = localStorage.getItem('access_token')!;
-}
-
-/**
 * After the user has submitted his access token, try to perform an API call
 * to fetch his top tracks. If it fails, display an error message.
 * @returns
 */
 const submitToken = async () => {
     const tokenField = document.querySelector('input');
-    accessToken = tokenField!.value;
+    localStorage.setItem('access_token', tokenField!.value);
     initiateLogin();
 }
 
@@ -71,7 +61,8 @@ const submitToken = async () => {
 const initiateLogin = async () => {
     const res = await fetch(`${FETCH_URL}${totalCount}`, {
         headers: {
-            Authorization: `Bearer ${accessToken}`
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`
+
         }
     });
 
@@ -148,7 +139,6 @@ const authorizeWithSpotify = async (code: string) => {
     await fetch(url, payload)
         .then(res => res.json())
         .then(res => {
-            accessToken = res.access_token;
             localStorage.setItem('access_token', res.access_token);
             localStorage.setItem('refresh_token', res.refresh_token);
             initiateLogin();
@@ -253,17 +243,44 @@ const toggleSpinner = () => {
 const fetchData = async () => {
     toggleSpinner();
 
-// TODO implement logic of refreshing the access token if refresh token is present
-// if it fails, reset the state
-
     const response = await fetch(`${FETCH_URL}${totalCount}`, {
         headers: {
-            Authorization: `Bearer ${accessToken}`
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`
         }
     }).then(res => res.json());
 
     if (response.error) {
-        alert(response.error.message);
+        // TODO extract in separate fn - refreshAccessToken
+        const refreshToken: string | null = localStorage.getItem('refresh_token');
+        if (refreshToken) {
+            const payload: RequestInit = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    client_id: CLIENT_ID,
+                    grant_type: 'refresh_token',
+                    refresh_token: refreshToken
+                })
+            }
+
+            const url = 'https://accounts.spotify.com/api/token';
+            const res = await fetch(url, payload)
+                .then(res => res.json());
+
+            toggleSpinner();
+            if (res.error) {
+                localStorage.clear();
+                return await displayLogin();
+            }
+
+            // TODO KNOWN ERROR - after grabbing a new access token with the refresh token
+            // and reloading the page, the logout button is gone!
+            localStorage.setItem('access_token', res.access_token);
+            return await renderTracksView();
+        }
+
         localStorage.clear();
         toggleSpinner();
         await displayLogin();
@@ -339,7 +356,6 @@ const resetState = () => {
     if (inputField) inputField.value = '';
 
     totalCount = 0;
-    accessToken = '';
     data = [];
     limitReached = false;
     trackPosition = 0;
