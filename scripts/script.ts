@@ -275,10 +275,9 @@ const fetchData = async () => {
                 return await displayLogin();
             }
 
-            // TODO KNOWN ERROR - after grabbing a new access token with the refresh token
-            // and reloading the page, the logout button is gone!
             localStorage.setItem('access_token', res.access_token);
-            return await renderTracksView();
+            await renderTracksView();
+            return await renderLogoutButton();
         }
 
         localStorage.clear();
