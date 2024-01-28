@@ -83,6 +83,8 @@ const initiateLogin = async () => {
  * which is used to obtain an acess token.
  */
 const connectWithSpotify = async () => {
+    // BUG only on the first login with spotify the users gets a "Invalid Access TOken"
+    // error, not permitting him to use the app!
     const scope = 'user-top-read user-read-private user-read-email';
     // const redirectUri = 'https://thesowut.github.io/spotify-insight/';
     const redirectUri = 'http://localhost:5500';
