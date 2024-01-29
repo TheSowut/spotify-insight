@@ -75,11 +75,12 @@ a:hover {
 
 .track,
 footer {
-    margin-top: 6%;
+    margin-top: 5%;
     text-align: center;
     font-size: 2.5em;
     background: #191414;
     width: 90%;
+    padding: 0.3em 1em;
 
     display: flex;
     flex-direction: row;
@@ -227,16 +228,24 @@ footer {
     }
 }
 
-@media only screen and (max-width: 700px) {
+@media only screen and (max-width: 900px) {
     .container {
         width: 100%;
     }
 
     .track {
+        margin-top: 10%;
         font-size: 2em;
+        width: 85%;
     }
 
     input {
         width: 50%;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .track {
+        width: 65%;
     }
 }
