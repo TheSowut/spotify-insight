@@ -140,6 +140,7 @@ footer {
     font-size: 2em;
     background-color: #191414;
     border: none;
+    padding: 0.25em;
 }
 
 .logout-button:hover {
@@ -247,5 +248,9 @@ footer {
 @media only screen and (max-width: 480px) {
     .track {
         width: 65%;
+    }
+
+    .logout-button {
+        font-size: 1.5em;
     }
 }
