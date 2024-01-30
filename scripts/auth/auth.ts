@@ -11,7 +11,7 @@ export class CustomPKCEAuthorization {
      * @param length
      * @returns
      */
-    private generateRandomString = (length: number = 64) => {
+    private generateRandomString = (length: number = 64): string => {
         const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         const values = crypto.getRandomValues(new Uint8Array(length));
 
@@ -23,7 +23,7 @@ export class CustomPKCEAuthorization {
      * @param plain
      * @returns
      */
-    private sha256 = async (plain: string) => {
+    private sha256 = (plain: string): Promise<ArrayBuffer> => {
         const encoder = new TextEncoder();
         const data = encoder.encode(plain);
 
@@ -35,7 +35,7 @@ export class CustomPKCEAuthorization {
      * @param input
      * @returns
      */
-    private base64encode = (input: any) => {
+    private base64encode = (input: ArrayBuffer): string => {
         return btoa(String.fromCharCode(...new Uint8Array(input)))
             .replace(/=/g, '')
             .replace(/\+/g, '-')
