@@ -68,6 +68,14 @@ const initiateLogin = async () => {
 
     if (res.status !== 200) {
         alert(MESSAGE.INVALID_ACCESS_TOKEN);
+        const isLoginDisplayed = document.querySelector('.container');
+
+        // If the code_verifier has been modified during spotify authorization
+        // login will not be displayed due to the reroute.
+        if (!isLoginDisplayed) {
+            await displayLogin();
+        }
+
         return resetState();
     }
 
@@ -121,7 +129,7 @@ const authorizeWithSpotify = async (code: string) => {
         alert(MESSAGE.INVALID_ACCESS_TOKEN);
         resetState();
 
-        return displayLogin();
+        return await displayLogin();
     }
 
     const payload: RequestInit = {
