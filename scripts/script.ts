@@ -94,8 +94,7 @@ const connectWithSpotify = async () => {
     // BUG only on the first login with spotify the users gets a "Invalid Access TOken"
     // error, not permitting him to use the app!
     const scope = 'user-top-read user-read-private user-read-email';
-    // const redirectUri = 'https://thesowut.github.io/spotify-insight/';
-    const redirectUri = 'http://localhost:5500';
+    const redirectUri = 'https://thesowut.github.io/spotify-insight/';
     const codeChallenge = await PKCEClient.obtainCodeChallenge();
     const authUri = new URL("https://accounts.spotify.com/authorize");
 
@@ -121,8 +120,7 @@ const connectWithSpotify = async () => {
  */
 const authorizeWithSpotify = async (code: string) => {
     const codeVerifier: string | null = localStorage.getItem('code_verifier');
-    // const redirectUri = 'https://thesowut.github.io/spotify-insight/';
-    const redirectUri = 'http://localhost:5500';
+    const redirectUri = 'https://thesowut.github.io/spotify-insight/';
     const url = 'https://accounts.spotify.com/api/token';
 
     if (!codeVerifier) {
