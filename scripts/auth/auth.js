@@ -1,0 +1,60 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+/**
+ * Custom implementation of the PKCE Authorization Flow.
+ * 1. Generate Random String.
+ * 2. Hash it.
+ * 3. Base 64 encode the hash to be used as code challenge.
+ */
+export class CustomPKCEAuthorization {
+    constructor() {
+        /**
+         * Generate a random string to be used as code verifier.
+         * @param length
+         * @returns
+         */
+        this.generateRandomString = (length = 64) => {
+            const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const values = crypto.getRandomValues(new Uint8Array(length));
+            return values.reduce((acc, x) => acc + possible[x % possible.length], '');
+        };
+        /**
+         * Hash the code verifier to be as used as code challenge.
+         * @param plain
+         * @returns
+         */
+        this.sha256 = (plain) => {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(plain);
+            return window.crypto.subtle.digest('SHA-256', data);
+        };
+        /**
+         * Base64 encode the sha256 hashed random string value.
+         * @param input
+         * @returns
+         */
+        this.base64encode = (input) => {
+            return btoa(String.fromCharCode(...new Uint8Array(input)))
+                .replace(/=/g, '')
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_');
+        };
+        /**
+         * Generate a code verifier and challenge to be used during the authorization.
+         * @returns
+         */
+        this.obtainCodeChallenge = () => __awaiter(this, void 0, void 0, function* () {
+            const codeVerifier = this.generateRandomString(64);
+            window.localStorage.setItem('code_verifier', codeVerifier);
+            const hashed = yield this.sha256(codeVerifier);
+            return this.base64encode(hashed);
+        });
+    }
+}
