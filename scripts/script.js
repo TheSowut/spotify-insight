@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { CustomPKCEAuthorization } from "./auth/auth.js";
-import { CLIENT_ID, EMOJIS, FETCH_URL, MAX_AMOUNT_OF_TRACKS, ROOT } from "./constants/const.js";
+import { CLIENT_ID, DEV_URL, EMOJIS, FETCH_URL, IS_PRODUCTION, MAX_AMOUNT_OF_TRACKS, PROD_URL, ROOT } from "./constants/const.js";
 import { MESSAGE } from "./enums/message.js";
 import { SCREEN } from "./enums/screen.js";
 // Variables
@@ -19,6 +19,7 @@ let limitReached = false;
 let trackPosition = 0;
 let activeScreen;
 let PKCEClient = new CustomPKCEAuthorization();
+let redirectUri = '';
 /**
 * If limit has been reached or a fetch request is being performed, exit.
 * Otherwise validate user access token and perform the API call.
@@ -91,7 +92,6 @@ const connectWithSpotify = () => __awaiter(void 0, void 0, void 0, function* () 
     // BUG only on the first login with spotify the users gets a "Invalid Access TOken"
     // error, not permitting him to use the app!
     const scope = 'user-top-read user-read-private user-read-email';
-    const redirectUri = 'https://thesowut.github.io/spotify-insight/';
     const codeChallenge = yield PKCEClient.obtainCodeChallenge();
     const authUri = new URL("https://accounts.spotify.com/authorize");
     const params = {
@@ -114,7 +114,6 @@ const connectWithSpotify = () => __awaiter(void 0, void 0, void 0, function* () 
  */
 const authorizeWithSpotify = (code) => __awaiter(void 0, void 0, void 0, function* () {
     const codeVerifier = localStorage.getItem('code_verifier');
-    const redirectUri = 'https://thesowut.github.io/spotify-insight/';
     const url = 'https://accounts.spotify.com/api/token';
     if (!codeVerifier) {
         alert(MESSAGE.INVALID_ACCESS_TOKEN);
@@ -161,7 +160,8 @@ const displayLogin = () => __awaiter(void 0, void 0, void 0, function* () {
     // Image element.
     const playButton = new Image();
     playButton.classList.add('play-button');
-    playButton.src = 'images/play.png';
+    playButton.src = 'spotify-insight/images/play.png';
+    playButton.src = IS_PRODUCTION ? 'spotify-insight/images/play.png' : 'images/play.png';
     playButton.onclick = yield submitToken;
     // Spotify button container.
     const spotifyButtonContainer = document.createElement('div');
@@ -169,7 +169,7 @@ const displayLogin = () => __awaiter(void 0, void 0, void 0, function* () {
     // Connect with spotify button.
     const connectWithSpotifyButton = new Image();
     connectWithSpotifyButton.classList.add('connect-with-spotify-button');
-    connectWithSpotifyButton.src = 'images/spotify_logo.svg';
+    connectWithSpotifyButton.src = IS_PRODUCTION ? 'spotify-insight/images/spotify_logo.svg' : 'images/spotify_logo.svg';
     connectWithSpotifyButton.onclick = yield connectWithSpotify;
     spotifyButtonContainer.appendChild(connectWithSpotifyButton);
     container.appendChild(input);
@@ -332,11 +332,15 @@ const resetState = () => {
     limitReached = false;
     trackPosition = 0;
 };
+const setRedirectUri = () => {
+    redirectUri = IS_PRODUCTION ? PROD_URL : DEV_URL;
+};
 /**
 * Check if the user has an access token stored in the local storage.
 * If yes, perform the fetch, if not, display the "login" screen.
 */
 window.addEventListener('load', () => __awaiter(void 0, void 0, void 0, function* () {
+    setRedirectUri();
     const searchParams = new URLSearchParams(window.location.search);
     const authorizationCode = searchParams.get('code');
     if (authorizationCode) {
