@@ -97,7 +97,6 @@ const connectWithSpotify = async () => {
     const scope = 'user-top-read user-read-private user-read-email';
     const codeChallenge = await PKCEClient.obtainCodeChallenge();
     const authUri = new URL("https://accounts.spotify.com/authorize");
-    alert(redirectUri);
 
     const params = {
         response_type: 'code',
@@ -105,7 +104,7 @@ const connectWithSpotify = async () => {
         scope,
         code_challenge_method: 'S256',
         code_challenge: codeChallenge,
-        redirect_uri: redirectUri,
+        redirect_uri: 'https://thesowut.github.io/spotify-insight',
     }
 
     authUri.search = new URLSearchParams(params).toString();
@@ -129,7 +128,6 @@ const authorizeWithSpotify = async (code: string) => {
 
         return await displayLogin();
     }
-    alert(redirectUri);
 
     const payload: RequestInit = {
         method: 'POST',
@@ -140,7 +138,7 @@ const authorizeWithSpotify = async (code: string) => {
             client_id: CLIENT_ID,
             grant_type: 'authorization_code',
             code,
-            redirect_uri: redirectUri,
+            redirect_uri: 'https://thesowut.github.io/spotify-insight',
             code_verifier: codeVerifier
         })
     }
