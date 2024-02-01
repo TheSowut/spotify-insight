@@ -120,7 +120,6 @@ const authorizeWithSpotify = (code) => __awaiter(void 0, void 0, void 0, functio
         resetState();
         return yield displayLogin();
     }
-    alert(redirectUri);
     const payload = {
         method: 'POST',
         headers: {
@@ -161,8 +160,8 @@ const displayLogin = () => __awaiter(void 0, void 0, void 0, function* () {
     // Image element.
     const playButton = new Image();
     playButton.classList.add('play-button');
-    playButton.src = 'spotify-insight/images/play.png';
-    playButton.src = IS_PRODUCTION ? 'spotify-insight/images/play.png' : 'images/play.png';
+    // playButton.src = IS_PRODUCTION ? 'spotify-insight/images/play.png' : 'images/play.png';
+    playButton.src = 'images/play.png';
     playButton.onclick = yield submitToken;
     // Spotify button container.
     const spotifyButtonContainer = document.createElement('div');
@@ -170,7 +169,8 @@ const displayLogin = () => __awaiter(void 0, void 0, void 0, function* () {
     // Connect with spotify button.
     const connectWithSpotifyButton = new Image();
     connectWithSpotifyButton.classList.add('connect-with-spotify-button');
-    connectWithSpotifyButton.src = IS_PRODUCTION ? 'spotify-insight/images/spotify_logo.svg' : 'images/spotify_logo.svg';
+    // connectWithSpotifyButton.src = IS_PRODUCTION ? 'spotify-insight/images/spotify_logo.svg' : 'images/spotify_logo.svg';
+    connectWithSpotifyButton.src = 'images/spotify_logo.svg';
     connectWithSpotifyButton.onclick = yield connectWithSpotify;
     spotifyButtonContainer.appendChild(connectWithSpotifyButton);
     container.appendChild(input);

@@ -128,7 +128,6 @@ const authorizeWithSpotify = async (code: string) => {
 
         return await displayLogin();
     }
-    alert(redirectUri);
 
     const payload: RequestInit = {
         method: 'POST',
@@ -176,8 +175,8 @@ const displayLogin = async () => {
     // Image element.
     const playButton = new Image();
     playButton.classList.add('play-button');
-    playButton.src = 'spotify-insight/images/play.png';
-    playButton.src = IS_PRODUCTION ? 'spotify-insight/images/play.png' : 'images/play.png';
+    // playButton.src = IS_PRODUCTION ? 'spotify-insight/images/play.png' : 'images/play.png';
+    playButton.src = 'images/play.png';
     playButton.onclick = await submitToken;
 
     // Spotify button container.
@@ -187,7 +186,8 @@ const displayLogin = async () => {
     // Connect with spotify button.
     const connectWithSpotifyButton = new Image();
     connectWithSpotifyButton.classList.add('connect-with-spotify-button');
-    connectWithSpotifyButton.src = IS_PRODUCTION ? 'spotify-insight/images/spotify_logo.svg' : 'images/spotify_logo.svg';
+    // connectWithSpotifyButton.src = IS_PRODUCTION ? 'spotify-insight/images/spotify_logo.svg' : 'images/spotify_logo.svg';
+    connectWithSpotifyButton.src = 'images/spotify_logo.svg';
     connectWithSpotifyButton.onclick = await connectWithSpotify;
 
     spotifyButtonContainer.appendChild(connectWithSpotifyButton);
