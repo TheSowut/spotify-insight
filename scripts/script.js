@@ -144,7 +144,7 @@ const authorizeWithSpotify = (code) => __awaiter(void 0, void 0, void 0, functio
 /**
 * Display the access token input field.
 */
-const displayLogin = () => __awaiter(void 0, void 0, void 0, function* () {
+const displayLogin = (fromLogout = false) => __awaiter(void 0, void 0, void 0, function* () {
     activeScreen = SCREEN.LOGIN;
     const rowContainer = document.createElement('div');
     rowContainer.classList.add('row-container');
@@ -160,7 +160,7 @@ const displayLogin = () => __awaiter(void 0, void 0, void 0, function* () {
     // Image element.
     const playButton = new Image();
     playButton.classList.add('play-button');
-    // playButton.src = IS_PRODUCTION ? 'spotify-insight/images/play.png' : 'images/play.png';
+    playButton.src = fromLogout ? 'spotify-insight/images/play.png' : 'images/play.png';
     playButton.src = 'images/play.png';
     playButton.onclick = yield submitToken;
     // Spotify button container.
@@ -169,8 +169,7 @@ const displayLogin = () => __awaiter(void 0, void 0, void 0, function* () {
     // Connect with spotify button.
     const connectWithSpotifyButton = new Image();
     connectWithSpotifyButton.classList.add('connect-with-spotify-button');
-    // connectWithSpotifyButton.src = IS_PRODUCTION ? 'spotify-insight/images/spotify_logo.svg' : 'images/spotify_logo.svg';
-    connectWithSpotifyButton.src = 'images/spotify_logo.svg';
+    connectWithSpotifyButton.src = fromLogout ? 'spotify-insight/images/spotify_logo.svg' : 'images/spotify_logo.svg';
     connectWithSpotifyButton.onclick = yield connectWithSpotify;
     spotifyButtonContainer.appendChild(connectWithSpotifyButton);
     container.appendChild(input);
@@ -308,7 +307,7 @@ const logout = () => __awaiter(void 0, void 0, void 0, function* () {
     if (footer)
         ROOT === null || ROOT === void 0 ? void 0 : ROOT.removeChild(footer);
     resetState();
-    yield displayLogin();
+    yield displayLogin(true);
 });
 /**
  * Return the user to the top of the page.

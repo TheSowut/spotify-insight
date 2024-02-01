@@ -155,7 +155,7 @@ const authorizeWithSpotify = async (code: string) => {
 /**
 * Display the access token input field.
 */
-const displayLogin = async () => {
+const displayLogin = async (fromLogout: boolean = false) => {
     activeScreen = SCREEN.LOGIN;
     const rowContainer = document.createElement('div');
     rowContainer.classList.add('row-container');
@@ -175,7 +175,7 @@ const displayLogin = async () => {
     // Image element.
     const playButton = new Image();
     playButton.classList.add('play-button');
-    // playButton.src = IS_PRODUCTION ? 'spotify-insight/images/play.png' : 'images/play.png';
+    playButton.src = fromLogout ? 'spotify-insight/images/play.png' : 'images/play.png';
     playButton.src = 'images/play.png';
     playButton.onclick = await submitToken;
 
@@ -186,8 +186,7 @@ const displayLogin = async () => {
     // Connect with spotify button.
     const connectWithSpotifyButton = new Image();
     connectWithSpotifyButton.classList.add('connect-with-spotify-button');
-    // connectWithSpotifyButton.src = IS_PRODUCTION ? 'spotify-insight/images/spotify_logo.svg' : 'images/spotify_logo.svg';
-    connectWithSpotifyButton.src = 'images/spotify_logo.svg';
+    connectWithSpotifyButton.src = fromLogout ? 'spotify-insight/images/spotify_logo.svg' : 'images/spotify_logo.svg';
     connectWithSpotifyButton.onclick = await connectWithSpotify;
 
     spotifyButtonContainer.appendChild(connectWithSpotifyButton);
@@ -340,7 +339,7 @@ const logout = async () => {
     if (logoutBtn) ROOT?.removeChild(logoutBtn);
     if (footer) ROOT?.removeChild(footer);
     resetState();
-    await displayLogin();
+    await displayLogin(true);
 }
 
 /**
