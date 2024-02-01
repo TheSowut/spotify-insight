@@ -1,31 +1,16 @@
-// Constants
-const ROOT = document.querySelector('#root');
-const FETCH_URL: string = 'https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=10&offset=';
-const EMOJIS = [
-    '🎼',
-    '🎵',
-    '🎶',
-    '🎧',
-    '🎸',
-    '🎹',
-    '🎷',
-    '🎺',
-    '🎻'
-];
-const MAX_AMOUNT_OF_TRACKS: number = 50;
-enum SCREEN {
-    LOGIN,
-    SHOWCASE
-}
+import { CustomPKCEAuthorization } from "./auth/auth.js";
+import { CLIENT_ID, EMOJIS, FETCH_URL, MAX_AMOUNT_OF_TRACKS, ROOT } from "./constants/const.js";
+import { MESSAGE } from "./enums/message.js";
+import { SCREEN } from "./enums/screen.js";
 
 // Variables
 let totalCount: number = 0;
 let isFetching: boolean = false;
-let accessToken: string = '';
 let data: any[] = [];
 let limitReached: boolean = false;
 let trackPosition: number = 0;
 let activeScreen: SCREEN;
+let PKCEClient = new CustomPKCEAuthorization();
 
 /**
 * If limit has been reached or a fetch request is being performed, exit.
@@ -40,8 +25,6 @@ const renderTracksView = async () => {
         displayFooter();
         return;
     }
-
-    if (!accessToken.length) setAccessToken();
 
     let trackList = await fetchData();
     totalCount += trackList.length;
@@ -60,10 +43,6 @@ const renderTracksView = async () => {
     }
 }
 
-const setAccessToken = () => {
-    accessToken = localStorage.getItem('access_token')!;
-}
-
 /**
 * After the user has submitted his access token, try to perform an API call
 * to fetch his top tracks. If it fails, display an error message.
@@ -71,25 +50,109 @@ const setAccessToken = () => {
 */
 const submitToken = async () => {
     const tokenField = document.querySelector('input');
-    accessToken = tokenField!.value;
+    localStorage.setItem('access_token', tokenField!.value);
+    initiateLogin();
+}
+
+/**
+ * Start the login procedure.
+ * @returns
+ */
+const initiateLogin = async () => {
     const res = await fetch(`${FETCH_URL}${totalCount}`, {
         headers: {
-            Authorization: `Bearer ${accessToken}`
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`
+
         }
     });
 
     if (res.status !== 200) {
-        localStorage.clear();
-        alert('Invalid access token!');
-        tokenField!.value = "";
-        return;
+        alert(MESSAGE.INVALID_ACCESS_TOKEN);
+        const isLoginDisplayed = document.querySelector('.container');
+
+        // If the code_verifier has been modified during spotify authorization
+        // login will not be displayed due to the reroute.
+        if (!isLoginDisplayed) {
+            await displayLogin();
+        }
+
+        return resetState();
     }
 
-    localStorage.setItem('access_token', accessToken);
-    setAccessToken();
-    ROOT?.removeChild(document.querySelector('.column-container')!);
+    const columnContainer = document.querySelector('.column-container');
+    if (columnContainer) ROOT?.removeChild(columnContainer);
+
     await renderTracksView();
     await renderLogoutButton();
+}
+
+/**
+ * Authotize with spotify account to receive an authotization code,
+ * which is used to obtain an acess token.
+ */
+const connectWithSpotify = async () => {
+    // BUG only on the first login with spotify the users gets a "Invalid Access TOken"
+    // error, not permitting him to use the app!
+    const scope = 'user-top-read user-read-private user-read-email';
+    // const redirectUri = 'https://thesowut.github.io/spotify-insight/';
+    const redirectUri = 'http://localhost:5500';
+    const codeChallenge = await PKCEClient.obtainCodeChallenge();
+    const authUri = new URL("https://accounts.spotify.com/authorize");
+
+    const params = {
+        response_type: 'code',
+        client_id: CLIENT_ID,
+        scope,
+        code_challenge_method: 'S256',
+        code_challenge: codeChallenge,
+        redirect_uri: redirectUri,
+    }
+
+    authUri.search = new URLSearchParams(params).toString();
+    window.location.href = authUri.toString();
+}
+
+/**
+ * If 'code' provided as a URL-encoded parameter, try to verify it.
+ * If it's correct, load list of tracks.
+ * If not, return error.
+ *
+ * @param code
+ */
+const authorizeWithSpotify = async (code: string) => {
+    const codeVerifier: string | null = localStorage.getItem('code_verifier');
+    // const redirectUri = 'https://thesowut.github.io/spotify-insight/';
+    const redirectUri = 'http://localhost:5500';
+    const url = 'https://accounts.spotify.com/api/token';
+
+    if (!codeVerifier) {
+        alert(MESSAGE.INVALID_ACCESS_TOKEN);
+        resetState();
+
+        return await displayLogin();
+    }
+
+    const payload: RequestInit = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            client_id: CLIENT_ID,
+            grant_type: 'authorization_code',
+            code,
+            redirect_uri: redirectUri,
+            code_verifier: codeVerifier
+        })
+    }
+
+    await fetch(url, payload)
+        .then(res => res.json())
+        .then(res => {
+            localStorage.setItem('access_token', res.access_token);
+            localStorage.setItem('refresh_token', res.refresh_token);
+            initiateLogin();
+        });
 }
 
 /**
@@ -118,9 +181,20 @@ const displayLogin = async () => {
     playButton.src = './images/play.png'
     playButton.onclick = await submitToken;
 
-    // container.append(obtainToken);
+    // Spotify button container.
+    const spotifyButtonContainer = document.createElement('div');
+    spotifyButtonContainer.classList.add('spotify-image-container');
+
+    // Connect with spotify button.
+    const connectWithSpotifyButton = document.createElement('img');
+    connectWithSpotifyButton.classList.add('connect-with-spotify-button');
+    connectWithSpotifyButton.src = './images/spotify_logo.svg';
+    connectWithSpotifyButton.onclick = await connectWithSpotify;
+
+    spotifyButtonContainer.appendChild(connectWithSpotifyButton);
     container.appendChild(input);
     container.appendChild(playButton);
+    container.appendChild(spotifyButtonContainer);
     rowContainer.appendChild(container);
     columnContainer.appendChild(rowContainer);
     ROOT?.appendChild(columnContainer);
@@ -144,7 +218,7 @@ const displayFooter = () => {
  * Pick a random musical emoji and prefix it to the website title.
  */
 const updateWebsiteTitle = () => {
-    document.title = `${EMOJIS[Math.floor(Math.random() * EMOJIS.length)]} Spotify Insight`;
+    history.pushState({}, `${EMOJIS[Math.floor(Math.random() * EMOJIS.length)]} Spotify Insight`, '/');
 }
 
 /**
@@ -181,12 +255,41 @@ const fetchData = async () => {
 
     const response = await fetch(`${FETCH_URL}${totalCount}`, {
         headers: {
-            Authorization: `Bearer ${accessToken}`
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`
         }
     }).then(res => res.json());
 
     if (response.error) {
-        alert(response.error.message);
+        // TODO extract in separate fn - refreshAccessToken
+        const refreshToken: string | null = localStorage.getItem('refresh_token');
+        if (refreshToken) {
+            const payload: RequestInit = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    client_id: CLIENT_ID,
+                    grant_type: 'refresh_token',
+                    refresh_token: refreshToken
+                })
+            }
+
+            const url = 'https://accounts.spotify.com/api/token';
+            const res = await fetch(url, payload)
+                .then(res => res.json());
+
+            toggleSpinner();
+            if (res.error) {
+                localStorage.clear();
+                return await displayLogin();
+            }
+
+            localStorage.setItem('access_token', res.access_token);
+            await renderTracksView();
+            return await renderLogoutButton();
+        }
+
         localStorage.clear();
         toggleSpinner();
         await displayLogin();
@@ -256,9 +359,12 @@ const returnToTop = () => {
  */
 const resetState = () => {
     localStorage.clear();
+    updateWebsiteTitle();
+
+    const inputField = document.querySelector('input');
+    if (inputField) inputField.value = '';
 
     totalCount = 0;
-    accessToken = '';
     data = [];
     limitReached = false;
     trackPosition = 0;
@@ -269,9 +375,15 @@ const resetState = () => {
 * If yes, perform the fetch, if not, display the "login" screen.
 */
 window.addEventListener('load', async () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const authorizationCode = searchParams.get('code');
+
+    if (authorizationCode) {
+        return await authorizeWithSpotify(authorizationCode);
+    }
+
     if (!localStorage.getItem('access_token')) {
-        await displayLogin();
-        return;
+        return await displayLogin();
     }
 
     await renderTracksView();
