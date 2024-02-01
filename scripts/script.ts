@@ -104,7 +104,7 @@ const connectWithSpotify = async () => {
         scope,
         code_challenge_method: 'S256',
         code_challenge: codeChallenge,
-        redirect_uri: 'https://thesowut.github.io/spotify-insight',
+        redirect_uri: redirectUri,
     }
 
     authUri.search = new URLSearchParams(params).toString();
@@ -128,6 +128,7 @@ const authorizeWithSpotify = async (code: string) => {
 
         return await displayLogin();
     }
+    alert(redirectUri);
 
     const payload: RequestInit = {
         method: 'POST',
@@ -138,7 +139,7 @@ const authorizeWithSpotify = async (code: string) => {
             client_id: CLIENT_ID,
             grant_type: 'authorization_code',
             code,
-            redirect_uri: 'https://thesowut.github.io/spotify-insight',
+            redirect_uri: redirectUri,
             code_verifier: codeVerifier
         })
     }

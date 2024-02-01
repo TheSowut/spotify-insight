@@ -100,7 +100,7 @@ const connectWithSpotify = () => __awaiter(void 0, void 0, void 0, function* () 
         scope,
         code_challenge_method: 'S256',
         code_challenge: codeChallenge,
-        redirect_uri: 'https://thesowut.github.io/spotify-insight',
+        redirect_uri: redirectUri,
     };
     authUri.search = new URLSearchParams(params).toString();
     window.location.href = authUri.toString();
@@ -120,6 +120,7 @@ const authorizeWithSpotify = (code) => __awaiter(void 0, void 0, void 0, functio
         resetState();
         return yield displayLogin();
     }
+    alert(redirectUri);
     const payload = {
         method: 'POST',
         headers: {
@@ -129,7 +130,7 @@ const authorizeWithSpotify = (code) => __awaiter(void 0, void 0, void 0, functio
             client_id: CLIENT_ID,
             grant_type: 'authorization_code',
             code,
-            redirect_uri: 'https://thesowut.github.io/spotify-insight',
+            redirect_uri: redirectUri,
             code_verifier: codeVerifier
         })
     };
