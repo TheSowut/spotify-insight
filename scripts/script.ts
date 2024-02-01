@@ -151,10 +151,10 @@ const authorizeWithSpotify = async (code: string) => {
             initiateLogin();
         });
 }
-
 /**
-* Display the access token input field.
-*/
+ * Display the access token input field.
+ * @param fromLogout - if the user has recently logget out, the address is different
+ */
 const displayLogin = async (fromLogout: boolean = false) => {
     activeScreen = SCREEN.LOGIN;
     const rowContainer = document.createElement('div');
@@ -176,7 +176,6 @@ const displayLogin = async (fromLogout: boolean = false) => {
     const playButton = new Image();
     playButton.classList.add('play-button');
     playButton.src = fromLogout ? 'spotify-insight/images/play.png' : 'images/play.png';
-    playButton.src = 'images/play.png';
     playButton.onclick = await submitToken;
 
     // Spotify button container.
