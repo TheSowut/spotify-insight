@@ -159,17 +159,17 @@ const displayLogin = () => __awaiter(void 0, void 0, void 0, function* () {
     input.type = 'password';
     input.inputMode = 'password';
     // Image element.
-    const playButton = document.createElement('img');
+    const playButton = new Image();
     playButton.classList.add('play-button');
-    playButton.src = './images/play.png';
+    playButton.src = 'images/play.png';
     playButton.onclick = yield submitToken;
     // Spotify button container.
     const spotifyButtonContainer = document.createElement('div');
     spotifyButtonContainer.classList.add('spotify-image-container');
     // Connect with spotify button.
-    const connectWithSpotifyButton = document.createElement('img');
+    const connectWithSpotifyButton = new Image();
     connectWithSpotifyButton.classList.add('connect-with-spotify-button');
-    connectWithSpotifyButton.src = './images/spotify_logo.svg';
+    connectWithSpotifyButton.src = 'images/spotify_logo.svg';
     connectWithSpotifyButton.onclick = yield connectWithSpotify;
     spotifyButtonContainer.appendChild(connectWithSpotifyButton);
     container.appendChild(input);

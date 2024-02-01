@@ -174,9 +174,9 @@ const displayLogin = async () => {
     input.inputMode = 'password';
 
     // Image element.
-    const playButton = document.createElement('img');
+    const playButton = new Image();
     playButton.classList.add('play-button');
-    playButton.src = './images/play.png'
+    playButton.src = 'images/play.png';
     playButton.onclick = await submitToken;
 
     // Spotify button container.
@@ -184,9 +184,9 @@ const displayLogin = async () => {
     spotifyButtonContainer.classList.add('spotify-image-container');
 
     // Connect with spotify button.
-    const connectWithSpotifyButton = document.createElement('img');
+    const connectWithSpotifyButton = new Image();
     connectWithSpotifyButton.classList.add('connect-with-spotify-button');
-    connectWithSpotifyButton.src = './images/spotify_logo.svg';
+    connectWithSpotifyButton.src = 'images/spotify_logo.svg';
     connectWithSpotifyButton.onclick = await connectWithSpotify;
 
     spotifyButtonContainer.appendChild(connectWithSpotifyButton);
