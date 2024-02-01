@@ -195,7 +195,7 @@ const displayFooter = () => {
  * Pick a random musical emoji and prefix it to the website title.
  */
 const updateWebsiteTitle = () => {
-    history.pushState({}, `${EMOJIS[Math.floor(Math.random() * EMOJIS.length)]} Spotify Insight`, '/');
+    history.pushState({}, `${EMOJIS[Math.floor(Math.random() * EMOJIS.length)]} Spotify Insight`, '/spotify-insight');
 };
 /**
  * If an API call is being made display a spinner.
