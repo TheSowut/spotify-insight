@@ -94,6 +94,7 @@ const connectWithSpotify = () => __awaiter(void 0, void 0, void 0, function* () 
     const scope = 'user-top-read user-read-private user-read-email';
     const codeChallenge = yield PKCEClient.obtainCodeChallenge();
     const authUri = new URL("https://accounts.spotify.com/authorize");
+    alert(redirectUri);
     const params = {
         response_type: 'code',
         client_id: CLIENT_ID,
@@ -120,6 +121,7 @@ const authorizeWithSpotify = (code) => __awaiter(void 0, void 0, void 0, functio
         resetState();
         return yield displayLogin();
     }
+    alert(redirectUri);
     const payload = {
         method: 'POST',
         headers: {
@@ -332,6 +334,9 @@ const resetState = () => {
     limitReached = false;
     trackPosition = 0;
 };
+/**
+ * Set the redirect url based on whether we're running DEV or PROD mode.
+ */
 const setRedirectUri = () => {
     redirectUri = IS_PRODUCTION ? PROD_URL : DEV_URL;
 };

@@ -97,6 +97,7 @@ const connectWithSpotify = async () => {
     const scope = 'user-top-read user-read-private user-read-email';
     const codeChallenge = await PKCEClient.obtainCodeChallenge();
     const authUri = new URL("https://accounts.spotify.com/authorize");
+    alert(redirectUri);
 
     const params = {
         response_type: 'code',
@@ -128,6 +129,7 @@ const authorizeWithSpotify = async (code: string) => {
 
         return await displayLogin();
     }
+    alert(redirectUri);
 
     const payload: RequestInit = {
         method: 'POST',
