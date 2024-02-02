@@ -91,7 +91,7 @@ const initiateLogin = async () => {
  * which is used to obtain an acess token.
  */
 const connectWithSpotify = async () => {
-    const scope = 'user-top-read user-read-private user-read-email';
+    const scope = 'user-top-read';
     const codeChallenge = await PKCEClient.obtainCodeChallenge();
     const authUri = new URL("https://accounts.spotify.com/authorize");
 

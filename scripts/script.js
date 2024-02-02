@@ -88,7 +88,7 @@ const initiateLogin = () => __awaiter(void 0, void 0, void 0, function* () {
  * which is used to obtain an acess token.
  */
 const connectWithSpotify = () => __awaiter(void 0, void 0, void 0, function* () {
-    const scope = 'user-top-read user-read-private user-read-email';
+    const scope = 'user-top-read';
     const codeChallenge = yield PKCEClient.obtainCodeChallenge();
     const authUri = new URL("https://accounts.spotify.com/authorize");
     const params = {
