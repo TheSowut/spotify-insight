@@ -91,8 +91,6 @@ const initiateLogin = async () => {
  * which is used to obtain an acess token.
  */
 const connectWithSpotify = async () => {
-    // BUG only on the first login with spotify the users gets a "Invalid Access TOken"
-    // error, not permitting him to use the app!
     const scope = 'user-top-read user-read-private user-read-email';
     const codeChallenge = await PKCEClient.obtainCodeChallenge();
     const authUri = new URL("https://accounts.spotify.com/authorize");
@@ -214,7 +212,8 @@ const displayFooter = () => {
  * Pick a random musical emoji and prefix it to the website title.
  */
 const updateWebsiteTitle = () => {
-    history.pushState({}, `${EMOJIS[Math.floor(Math.random() * EMOJIS.length)]} Spotify Insight`, '/spotify-insight');
+    const defaultRoute: string = IS_PRODUCTION ? '/spotify-insight' : '/';
+    history.pushState({}, `${EMOJIS[Math.floor(Math.random() * EMOJIS.length)]} Spotify Insight`, defaultRoute);
 }
 
 /**
@@ -256,25 +255,10 @@ const fetchData = async () => {
     }).then(res => res.json());
 
     if (response.error) {
-        // TODO extract in separate fn - refreshAccessToken
         const refreshToken: string | null = localStorage.getItem('refresh_token');
+
         if (refreshToken) {
-            const payload: RequestInit = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    client_id: CLIENT_ID,
-                    grant_type: 'refresh_token',
-                    refresh_token: refreshToken
-                })
-            }
-
-            const url = 'https://accounts.spotify.com/api/token';
-            const res = await fetch(url, payload)
-                .then(res => res.json());
-
+            const res = await PKCEClient.refreshAccessToken(CLIENT_ID, refreshToken);
             toggleSpinner();
             if (res.error) {
                 localStorage.clear();

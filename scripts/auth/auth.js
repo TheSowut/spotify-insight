@@ -16,6 +16,38 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 export class CustomPKCEAuthorization {
     constructor() {
         /**
+         * Generate a code verifier and challenge to be used during the authorization.
+         * @returns
+         */
+        this.obtainCodeChallenge = () => __awaiter(this, void 0, void 0, function* () {
+            const codeVerifier = this.generateRandomString(64);
+            window.localStorage.setItem('code_verifier', codeVerifier);
+            const hashed = yield this.sha256(codeVerifier);
+            return this.base64encode(hashed);
+        });
+        /**
+         * Use the refresh token to obtain a new access token once it has expired.
+         * @param CLIENT_ID
+         * @param refreshToken
+         * @returns
+         */
+        this.refreshAccessToken = (CLIENT_ID, refreshToken) => __awaiter(this, void 0, void 0, function* () {
+            const payload = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    client_id: CLIENT_ID,
+                    grant_type: 'refresh_token',
+                    refresh_token: refreshToken
+                })
+            };
+            const url = 'https://accounts.spotify.com/api/token';
+            return yield fetch(url, payload)
+                .then(res => res.json());
+        });
+        /**
          * Generate a random string to be used as code verifier.
          * @param length
          * @returns
@@ -46,15 +78,5 @@ export class CustomPKCEAuthorization {
                 .replace(/\+/g, '-')
                 .replace(/\//g, '_');
         };
-        /**
-         * Generate a code verifier and challenge to be used during the authorization.
-         * @returns
-         */
-        this.obtainCodeChallenge = () => __awaiter(this, void 0, void 0, function* () {
-            const codeVerifier = this.generateRandomString(64);
-            window.localStorage.setItem('code_verifier', codeVerifier);
-            const hashed = yield this.sha256(codeVerifier);
-            return this.base64encode(hashed);
-        });
     }
 }

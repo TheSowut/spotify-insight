@@ -7,6 +7,42 @@
 export class CustomPKCEAuthorization {
 
     /**
+     * Generate a code verifier and challenge to be used during the authorization.
+     * @returns
+     */
+    public obtainCodeChallenge = async () => {
+        const codeVerifier = this.generateRandomString(64);
+        window.localStorage.setItem('code_verifier', codeVerifier);
+
+        const hashed = await this.sha256(codeVerifier);
+        return this.base64encode(hashed);
+    }
+
+    /**
+     * Use the refresh token to obtain a new access token once it has expired.
+     * @param CLIENT_ID
+     * @param refreshToken
+     * @returns
+     */
+    public refreshAccessToken = async (CLIENT_ID: string, refreshToken: string) => {
+        const payload: RequestInit = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                client_id: CLIENT_ID,
+                grant_type: 'refresh_token',
+                refresh_token: refreshToken
+            })
+        }
+
+        const url = 'https://accounts.spotify.com/api/token';
+        return await fetch(url, payload)
+            .then(res => res.json());
+    }
+
+    /**
      * Generate a random string to be used as code verifier.
      * @param length
      * @returns
@@ -40,17 +76,5 @@ export class CustomPKCEAuthorization {
             .replace(/=/g, '')
             .replace(/\+/g, '-')
             .replace(/\//g, '_')
-    }
-
-    /**
-     * Generate a code verifier and challenge to be used during the authorization.
-     * @returns
-     */
-    public obtainCodeChallenge = async () => {
-        const codeVerifier = this.generateRandomString(64);
-        window.localStorage.setItem('code_verifier', codeVerifier);
-
-        const hashed = await this.sha256(codeVerifier);
-        return this.base64encode(hashed);
     }
 }
