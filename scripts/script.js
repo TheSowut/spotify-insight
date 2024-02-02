@@ -14,7 +14,6 @@ import { SCREEN } from "./enums/screen.js";
 // Variables
 let totalCount = 0;
 let isFetching = false;
-let data = [];
 let limitReached = false;
 let trackPosition = 0;
 let activeScreen;
@@ -161,7 +160,7 @@ const displayLogin = (fromLogout = false) => __awaiter(void 0, void 0, void 0, f
     // Image element.
     const playButton = new Image();
     playButton.classList.add('play-button');
-    playButton.src = fromLogout ? 'spotify-insight/images/play.png' : 'images/play.png';
+    playButton.src = fromLogout && IS_PRODUCTION ? 'spotify-insight/images/play.png' : 'images/play.png';
     playButton.onclick = yield submitToken;
     // Spotify button container.
     const spotifyButtonContainer = document.createElement('div');
@@ -169,7 +168,7 @@ const displayLogin = (fromLogout = false) => __awaiter(void 0, void 0, void 0, f
     // Connect with spotify button.
     const connectWithSpotifyButton = new Image();
     connectWithSpotifyButton.classList.add('connect-with-spotify-button');
-    connectWithSpotifyButton.src = fromLogout ? 'spotify-insight/images/spotify_logo.svg' : 'images/spotify_logo.svg';
+    connectWithSpotifyButton.src = fromLogout && IS_PRODUCTION ? 'spotify-insight/images/spotify_logo.svg' : 'images/spotify_logo.svg';
     connectWithSpotifyButton.onclick = yield connectWithSpotify;
     spotifyButtonContainer.appendChild(connectWithSpotifyButton);
     container.appendChild(input);
@@ -264,7 +263,6 @@ const fetchData = () => __awaiter(void 0, void 0, void 0, function* () {
         return;
     }
     updateWebsiteTitle();
-    data = [...data, response.items];
     isFetching = false;
     toggleSpinner();
     return response.items;
@@ -328,7 +326,6 @@ const resetState = () => {
     if (inputField)
         inputField.value = '';
     totalCount = 0;
-    data = [];
     limitReached = false;
     trackPosition = 0;
 };

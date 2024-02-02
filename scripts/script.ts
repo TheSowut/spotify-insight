@@ -6,7 +6,6 @@ import { SCREEN } from "./enums/screen.js";
 // Variables
 let totalCount: number = 0;
 let isFetching: boolean = false;
-let data: any[] = [];
 let limitReached: boolean = false;
 let trackPosition: number = 0;
 let activeScreen: SCREEN;
@@ -175,7 +174,7 @@ const displayLogin = async (fromLogout: boolean = false) => {
     // Image element.
     const playButton = new Image();
     playButton.classList.add('play-button');
-    playButton.src = fromLogout ? 'spotify-insight/images/play.png' : 'images/play.png';
+    playButton.src = fromLogout && IS_PRODUCTION ? 'spotify-insight/images/play.png' : 'images/play.png';
     playButton.onclick = await submitToken;
 
     // Spotify button container.
@@ -185,7 +184,7 @@ const displayLogin = async (fromLogout: boolean = false) => {
     // Connect with spotify button.
     const connectWithSpotifyButton = new Image();
     connectWithSpotifyButton.classList.add('connect-with-spotify-button');
-    connectWithSpotifyButton.src = fromLogout ? 'spotify-insight/images/spotify_logo.svg' : 'images/spotify_logo.svg';
+    connectWithSpotifyButton.src = fromLogout && IS_PRODUCTION ? 'spotify-insight/images/spotify_logo.svg' : 'images/spotify_logo.svg';
     connectWithSpotifyButton.onclick = await connectWithSpotify;
 
     spotifyButtonContainer.appendChild(connectWithSpotifyButton);
@@ -294,7 +293,6 @@ const fetchData = async () => {
     }
 
     updateWebsiteTitle();
-    data = [...data, response.items];
     isFetching = false;
     toggleSpinner();
 
@@ -362,7 +360,6 @@ const resetState = () => {
     if (inputField) inputField.value = '';
 
     totalCount = 0;
-    data = [];
     limitReached = false;
     trackPosition = 0;
 }
