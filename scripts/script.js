@@ -142,8 +142,9 @@ const authorizeWithSpotify = (code) => __awaiter(void 0, void 0, void 0, functio
     });
 });
 /**
-* Display the access token input field.
-*/
+ * Display the access token input field.
+ * @param fromLogout - if the user has recently logget out, the address is different
+ */
 const displayLogin = (fromLogout = false) => __awaiter(void 0, void 0, void 0, function* () {
     activeScreen = SCREEN.LOGIN;
     const rowContainer = document.createElement('div');
@@ -161,7 +162,6 @@ const displayLogin = (fromLogout = false) => __awaiter(void 0, void 0, void 0, f
     const playButton = new Image();
     playButton.classList.add('play-button');
     playButton.src = fromLogout ? 'spotify-insight/images/play.png' : 'images/play.png';
-    playButton.src = 'images/play.png';
     playButton.onclick = yield submitToken;
     // Spotify button container.
     const spotifyButtonContainer = document.createElement('div');
